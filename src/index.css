@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+
+  --color-brand-pink-light: #fce4ec;
+  --color-brand-pink: #f06292;
+  --color-brand-rose: #f8bbd0;
+  --color-brand-cream: #fdf8f7;
+  --color-brand-white: #ffffff;
+  --color-brand-plum: #3e363f;
+  --color-brand-charcoal: #2d2a2e;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-cream text-brand-charcoal font-sans selection:bg-brand-rose selection:text-brand-charcoal;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-medium tracking-tighter;
+  }
+}
+
+.scaffold-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(62, 54, 63, 0.08) 1px, transparent 0);
+  background-size: 32px 32px;
+}
+
+.glass-card {
+  @apply bg-white/60 backdrop-blur-xl border border-brand-plum/10 shadow-sm transition-all duration-300;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-br from-brand-charcoal via-brand-plum to-brand-charcoal;
+}

@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global safety net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    // Auth helpers
+    function getAdminData(email) {
+      return get(/databases/$(database)/documents/admins/$(email)).data;
+    }
+    function hasRole(role) {
+      return isSignedIn() && request.auth.token.email_verified == true
+        && (
+          (exists(/databases/$(database)/documents/admins/$(request.auth.token.email)) && getAdminData(request.auth.token.email).role == role)
+          || (request.auth.token.email == 'ayaan.kriplani2213@gmail.com' && role == 'admin')
+        );
+    }
+    function isAdmin() { return hasRole('admin'); }
+    function isModerator() { return hasRole('moderator'); }
+    function isStaff() { 
+      return isSignedIn() && request.auth.token.email_verified == true
+        && (
+          exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+          || request.auth.token.email == 'ayaan.kriplani2213@gmail.com'
+        );
+    }
+
+    // --- Inquiries ---
+    match /inquiries/{inquiryId} {
+      function isValidInquiry(data) {
+        return data.keys().hasAll(['name', 'email', 'whatsapp', 'message', 'status', 'createdAt', 'org'])
+          && data.keys().size() == 7
+          && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+          && data.org is string && data.org.size() <= 150
+          && data.email is string && data.email.size() <= 100 && data.email.matches('^.+@.+$')
+          && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 20
+          && data.message is string && data.message.size() <= 5000
+          && data.status in ['new', 'contacted', 'archived']
+          && data.createdAt is timestamp;
+      }
+
+      allow create: if isValidInquiry(incoming());
+      
+      // All staff can view and update status
+      allow get, list: if isStaff();
+      allow update: if isStaff() && isValidInquiry(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+
+    // --- Staff Management ---
+    match /admins/{email} {
+      function isValidStaff(data) {
+        return data.keys().hasAll(['role'])
+          && data.keys().size() == 1
+          && data.role in ['admin', 'moderator'];
+      }
+
+      allow read: if isSignedIn() && (request.auth.token.email == email || isStaff());
+      allow create, update, delete: if isAdmin() && isValidStaff(incoming());
+    }
+  }
+}

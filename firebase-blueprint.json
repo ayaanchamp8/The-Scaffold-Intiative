@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "A partnership inquiry from a potential partner",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the contact" },
+        "org": { "type": "string", "description": "Organization name" },
+        "email": { "type": "string", "format": "email", "description": "Work email address" },
+        "whatsapp": { "type": "string", "description": "WhatsApp contact number" },
+        "message": { "type": "string", "description": "Collaboration message" },
+        "status": { "type": "string", "enum": ["new", "contacted", "archived"], "description": "Current status of the inquiry" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the inquiry was created" }
+      },
+      "required": ["name", "email", "whatsapp", "message", "status", "createdAt", "org"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "User with administrative access to the portal (identified by email)",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["admin", "moderator"] }
+      },
+      "required": ["role"]
+    }
+  },
+  "firestore": {
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Collection of partnership inquiries"
+    },
+    "/admins/{email}": {
+      "schema": "Admin",
+      "description": "Users with admin permissions, keyed by email address"
+    }
+  }
+}
