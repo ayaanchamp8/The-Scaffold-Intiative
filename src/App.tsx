@@ -110,22 +110,20 @@ const PartnerModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     setErrorMessage("");
 
     try {
-      console.log("Submitting inquiry to API", formData);
-      const response = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      console.log("Submitting inquiry to Firestore", formData);
+      const inquiryPayload = {
+        name: formData.name,
+        org: formData.org || "",
+        email: formData.email,
+        whatsapp: formData.whatsapp,
+        message: formData.message,
+        status: "new",
+        createdAt: serverTimestamp(),
+      };
+      
+      await addDoc(collection(db, 'inquiries'), inquiryPayload);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        const msg = errorData.message ? `${errorData.error}: ${errorData.message}` : (errorData.error || "Failed to submit inquiry");
-        throw new Error(msg);
-      }
-
-      console.log("Inquiry submitted successfully via API");
+      console.log("Inquiry submitted successfully via Firestore");
       
       setStatus("success");
       setTimeout(() => {
