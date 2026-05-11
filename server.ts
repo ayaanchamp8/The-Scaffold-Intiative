@@ -74,16 +74,28 @@ const getFirebaseAdmin = () => {
 // Notification Service Helpers
 let resendClient: Resend | null = null;
 const getResend = () => {
-  if (!resendClient && process.env.RESEND_API_KEY) {
-    resendClient = new Resend(process.env.RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!resendClient && apiKey) {
+    resendClient = new Resend(apiKey);
   }
   return resendClient;
 };
 
 let twilioClient: any = null;
 const getTwilio = () => {
-  if (!twilioClient && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
+  const token = process.env.TWILIO_AUTH_TOKEN?.trim();
+  if (!twilioClient && sid && token) {
+    if (!sid.startsWith("AC")) {
+      console.warn("Twilio SID must start with AC (You provided a value that starts with: " + sid.substring(0, 2) + "). Ignoring Twilio config.");
+      return null;
+    }
+    try {
+      twilioClient = twilio(sid, token);
+    } catch (e: any) {
+      console.warn("Could not initialize Twilio:", e.message);
+      twilioClient = null;
+    }
   }
   return twilioClient;
 };
@@ -148,49 +160,14 @@ async function startServer() {
         }
       }
 
-      // 3. Automated Notifications (Email & WhatsApp)
+      // 3. Automated Admin Notifications (Only admin notifications, not submitter)
       const resend = getResend();
       const twilioSms = getTwilio();
-      const fromWhatsApp = process.env.TWILIO_WHATSAPP_FROM;
-      const adminEmail = process.env.ADMIN_EMAIL || "ayaan.kriplani2213@gmail.com";
-      const adminWhatsApp = process.env.ADMIN_WHATSAPP;
+      const fromWhatsApp = process.env.TWILIO_WHATSAPP_FROM?.trim();
+      const adminEmail = process.env.ADMIN_EMAIL?.trim() || "ayaan.kriplani2213@gmail.com";
+      const adminWhatsApp = process.env.ADMIN_WHATSAPP?.trim();
 
-      // Submitter Email
-      if (resend) {
-        try {
-          await resend.emails.send({
-            from: "The Scaffold Initiative <onboarding@resend.dev>",
-            to: email,
-            subject: "We received your inquiry - The Scaffold Initiative",
-            html: `<div style="font-family:sans-serif;padding:20px;max-width:600px;">
-              <h1>Hi ${name},</h1>
-              <p>Thank you for contacting The Scaffold Initiative. We've received your request and will follow up shortly.</p>
-              <div style="background:#f4f4f4;padding:15px;border-radius:8px;">
-                <p><strong>Org:</strong> ${org || "N/A"}</p>
-                <p><strong>Message:</strong> ${message}</p>
-              </div>
-            </div>`
-          });
-        } catch (e) {
-          console.error("Confirmation email failed:", e);
-        }
-      }
-
-      // Submitter WhatsApp
-      if (twilioSms && fromWhatsApp) {
-        try {
-          const toWA = whatsapp.startsWith("whatsapp:") ? whatsapp : `whatsapp:${whatsapp.startsWith("+") ? whatsapp : "+" + whatsapp}`;
-          await twilioSms.messages.create({
-            from: fromWhatsApp,
-            to: toWA,
-            body: `Hi ${name}, this is a confirmation from The Scaffold Initiative. We've received your inquiry and will reach out to you soon!`,
-          });
-        } catch (e) {
-          console.error("Confirmation WhatsApp failed:", e);
-        }
-      }
-
-      // Admin Notifications
+      // Admin Email
       if (resend && adminEmail) {
         try {
           await resend.emails.send({
@@ -199,18 +176,27 @@ async function startServer() {
             subject: `New Inquiry: ${name}`,
             html: `<p>New partner inquiry from <strong>${name}</strong>.</p><p>Email: ${email}</p><p>WhatsApp: ${whatsapp}</p><p>Message: ${message}</p>`
           });
-        } catch (e) {}
+          console.log("Admin Email sent.");
+        } catch (e: any) {
+          console.error("Failed to send admin email:", e?.message || e);
+        }
       }
 
-      if (twilioSms && fromWhatsApp && adminWhatsApp) {
+      // Admin WhatsApp
+      const formattedFromWhatsApp = fromWhatsApp ? (fromWhatsApp.startsWith("whatsapp:") ? fromWhatsApp : `whatsapp:${fromWhatsApp.startsWith("+") ? fromWhatsApp : "+" + fromWhatsApp}`) : undefined;
+      
+      if (twilioSms && formattedFromWhatsApp && adminWhatsApp) {
         try {
           const adminToWA = adminWhatsApp.startsWith("whatsapp:") ? adminWhatsApp : `whatsapp:${adminWhatsApp.startsWith("+") ? adminWhatsApp : "+" + adminWhatsApp}`;
           await twilioSms.messages.create({
-            from: fromWhatsApp,
+            from: formattedFromWhatsApp,
             to: adminToWA,
-            body: `NEW INQUIRY\nName: ${name}\nOrg: ${org || "N/A"}\nMessage: ${message.substring(0, 200)}...`,
+            body: `NEW INQUIRY\nName: ${name}\nOrg: ${org || "N/A"}\nMessage: ${message.substring(0, 200)}...`
           });
-        } catch (e) {}
+          console.log("Admin WhatsApp sent.");
+        } catch (e: any) {
+           console.error("Failed to send admin whatsapp:", e?.message || e);
+        }
       }
 
       res.status(201).json({ id: docId, success: true });

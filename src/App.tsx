@@ -155,38 +155,38 @@ const PartnerModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-full max-w-xl bg-brand-white rounded-[2.5rem] shadow-2xl relative overflow-hidden"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-brand-white rounded-[2.5rem] shadow-2xl relative"
           >
-            <div className="p-8 md:p-12">
+            <div className="p-6 md:p-8 text-center pt-8 md:pt-10">
               <button 
                 onClick={onClose}
-                className="absolute top-8 right-8 p-2 hover:bg-brand-pink-light rounded-full transition-colors group cursor-pointer"
+                className="absolute top-4 right-4 md:top-6 md:right-6 p-2 hover:bg-brand-pink-light rounded-full transition-colors group cursor-pointer"
               >
-                <X className="w-6 h-6 text-brand-plum group-hover:rotate-90 transition-transform" />
+                <X className="w-5 h-5 text-brand-plum group-hover:rotate-90 transition-transform" />
               </button>
               
-              <div className="mb-10 text-center">
-                <span className="text-[11px] font-bold tracking-[3px] uppercase text-brand-pink mb-4 block">Take Action</span>
-                <h3 className="text-4xl font-display tracking-tight text-brand-plum">Partner With Us</h3>
-                <p className="text-brand-charcoal/50 mt-4 text-sm font-medium">Join our global network to support neurodivergent inclusion.</p>
+              <div className="mb-6">
+                <span className="text-[10px] font-bold tracking-[3px] uppercase text-brand-pink mb-2 block">Take Action</span>
+                <h3 className="text-2xl md:text-3xl font-display tracking-tight text-brand-plum">Partner With Us</h3>
+                <p className="text-brand-charcoal/50 mt-2 text-xs font-medium px-2">Join our global network to support neurodivergent inclusion.</p>
               </div>
 
               {status === "success" ? (
-                <div className="py-12 text-center">
+                <div className="py-8 text-center">
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
+                    className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"
                   >
-                    <CheckCircle2 className="w-10 h-10" />
+                    <CheckCircle2 className="w-8 h-8" />
                   </motion.div>
-                  <h4 className="text-2xl font-bold text-brand-plum mb-2">Thank You!</h4>
-                  <p className="text-brand-charcoal/60">We have received your message and will get back to you shortly.</p>
+                  <h4 className="text-xl font-bold text-brand-plum mb-2">Thank You!</h4>
+                  <p className="text-brand-charcoal/60 text-xs md:text-sm">We have received your message and will get back to you shortly.</p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 text-left">
                   <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">Full Name</label>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Full Name</label>
                     <input 
                       required
                       disabled={status === "loading"}
@@ -194,58 +194,57 @@ const PartnerModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       placeholder="Enter your name"
-                      className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
                     />
                   </div>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div>
-                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">Organization</label>
+                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Organization</label>
                       <input 
                         disabled={status === "loading"}
                         type="text" 
                         value={formData.org}
                         onChange={(e) => setFormData({...formData, org: e.target.value})}
-                        placeholder="School or Nonprofit"
-                        className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all disabled:opacity-50"
+                        placeholder="Organization"
+                        className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">Work Email</label>
+                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">WhatsApp / Phone</label>
                       <input 
                         required
                         disabled={status === "loading"}
-                        type="email" 
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        placeholder="email@example.com"
-                        className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all disabled:opacity-50"
+                        type="tel" 
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
+                        placeholder="+91 XXXXX"
+                        className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
                       />
                     </div>
                   </div>
-                  
                   <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">WhatsApp Number</label>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Work Email</label>
                     <input 
                       required
                       disabled={status === "loading"}
-                      type="tel" 
-                      value={formData.whatsapp}
-                      onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                      placeholder="+91 XXXXX XXXXX"
-                      className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all disabled:opacity-50"
+                      type="email" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      placeholder="email@example.com"
+                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
                     />
                   </div>
-
+                  
                   <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">How you'd like to help</label>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">How you'd like to help</label>
                     <textarea 
                       required
                       disabled={status === "loading"}
-                      rows={4}
+                      rows={2}
                       value={formData.message}
                       onChange={(e) => setFormData({...formData, message: e.target.value})}
                       placeholder="Tell us about the collaboration..."
-                      className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all resize-none disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all resize-none disabled:opacity-50"
                     />
                   </div>
                   
@@ -401,7 +400,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     const path = `inquiries/${id}`;
     try {
       await deleteDoc(doc(db, 'inquiries', id));
-    } catch (err) {
+    } catch (err: any) {
+      alert("Failed to delete inquiry: " + err.message);
       handleFirestoreError(err, OperationType.DELETE, path);
     }
   };
@@ -429,6 +429,25 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
       await deleteDoc(doc(db, 'admins', id));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, path);
+    }
+  };
+
+  const handleSendInitialContact = async (inquiry: any) => {
+    try {
+      const formalizedMessage = `Thank you for contacting The Scaffold Initiative. We are thrilled at the prospect of working with you. We will review your inquiry and get back to you shortly. Please note that this chat will serve as our primary platform for communication.`;
+      
+      if (inquiry.whatsapp) {
+        const cleanWA = inquiry.whatsapp.replace(/[^0-9]/g, '');
+        window.open(`https://wa.me/${cleanWA}?text=${encodeURIComponent("Hi " + inquiry.name + ",\n\n" + formalizedMessage)}`, '_blank');
+      }
+      
+      if (inquiry.email) {
+        window.open(`mailto:${inquiry.email}?subject=${encodeURIComponent("Thank you for contacting The Scaffold Initiative")}&body=${encodeURIComponent("Hi " + inquiry.name + ",\n\n" + formalizedMessage)}`, '_blank');
+      }
+
+      await handleUpdateStatus(inquiry.id, 'contacted');
+    } catch (e: any) {
+      console.error("Error: " + e.message);
     }
   };
 
@@ -690,7 +709,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                       {[
                         "Full view of all incoming inquiries",
                         "Update inquiry status (New, Contacted, Archive)",
-                        "Delete inquiry records",
+                        "Cannot delete inquiry records",
                         "No access to Staff Management",
                         "Cannot add or remove other users"
                       ].map((p, i) => (
@@ -805,6 +824,14 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                         <div className="lg:w-64 flex lg:flex-col gap-3 justify-end lg:justify-start">
                           {inquiry.status !== 'contacted' && (
                             <button 
+                              onClick={() => handleSendInitialContact(inquiry)}
+                              className="flex-grow lg:flex-none py-4 bg-brand-pink text-brand-plum rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-brand-rose transition-all shadow-md cursor-pointer"
+                            >
+                              Send Initial Msg
+                            </button>
+                          )}
+                          {inquiry.status !== 'contacted' && (
+                            <button 
                               onClick={() => handleUpdateStatus(inquiry.id, 'contacted')}
                               className="flex-grow lg:flex-none py-4 bg-brand-plum text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-brand-charcoal transition-all shadow-md cursor-pointer"
                             >
@@ -819,13 +846,14 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                               Archive
                             </button>
                           )}
-                          <button 
-                            disabled={userRole !== 'admin'}
-                            onClick={() => handleDelete(inquiry.id)}
-                            className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-red-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+                          {userRole === 'admin' && (
+                            <button 
+                              onClick={() => handleDelete(inquiry.id)}
+                              className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-red-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -1314,10 +1342,17 @@ const Footer = () => (
       </div>
       <div className="border-t border-white/10 pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream/30">
         <p>© 2026 THE SCAFFOLD INITIATIVE.</p>
-        <div className="flex gap-8 px-8 py-3 border border-white/10 rounded-full">
+        <div className="flex gap-8 px-8 py-3 border border-white/10 rounded-full items-center">
           <p>Global Advocacy</p>
           <div className="w-px h-3 bg-white/20" />
           <p>Youth-Led Project</p>
+          <div className="w-px h-3 bg-white/20" />
+          <button 
+            onClick={() => (window as any).toggleAdmin?.()} 
+            className="hover:text-brand-rose transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
+          >
+            Staff Login
+          </button>
         </div>
       </div>
     </div>
@@ -1345,12 +1380,6 @@ const FinalCTA = ({ onOpenModal }: { onOpenModal: () => void }) => (
               <span className="group-hover:scale-110 block transition-transform">{text}</span>
             </button>
           ))}
-        </div>
-        <div className="mt-24 flex flex-col items-center gap-6">
-          <p className="text-brand-plum/40 text-[11px] uppercase font-bold tracking-[3px]">Direct Inquiry</p>
-          <a href="mailto:Ayaan.kriplani2213@gmail.com" className="text-2xl md:text-3xl font-display text-brand-charcoal hover:text-brand-plum transition-colors decoration-brand-rose underline decoration-4 underline-offset-8">
-            Ayaan.kriplani2213@gmail.com
-          </a>
         </div>
      </div>
   </section>

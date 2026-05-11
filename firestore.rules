@@ -36,13 +36,12 @@ service cloud.firestore {
     // --- Inquiries ---
     match /inquiries/{inquiryId} {
       function isValidInquiry(data) {
-        return data.keys().hasAll(['name', 'email', 'whatsapp', 'message', 'status', 'createdAt', 'org'])
-          && data.keys().size() == 7
-          && data.name is string && data.name.size() > 0 && data.name.size() <= 100
-          && data.org is string && data.org.size() <= 150
-          && data.email is string && data.email.size() <= 100 && data.email.matches('^.+@.+$')
-          && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 20
-          && data.message is string && data.message.size() <= 5000
+        return data.keys().hasAll(['name', 'email', 'whatsapp', 'message', 'status', 'createdAt'])
+          && data.name is string
+          && (!('org' in data) || data.org is string)
+          && data.email is string
+          && data.whatsapp is string
+          && data.message is string
           && data.status in ['new', 'contacted', 'archived']
           && data.createdAt is timestamp;
       }
@@ -56,6 +55,20 @@ service cloud.firestore {
       
       // Only admins can delete
       allow delete: if isAdmin();
+    }
+
+    // --- Extensions ---
+    match /mail/{mailId} {
+      // Allow unrestricted creation for inquiries so the web form can trigger emails via extension.
+      // In production, tighten this up to prevent spam API usage (e.g., rate limit via function, restrict subject/body content).
+      allow create: if incoming().keys().hasAny(['to', 'message']);
+      allow read, update, delete: if isStaff();
+    }
+
+    match /messages/{msgId} {
+      // Allow unrestricted creation for SMS/WhatsApp triggers.
+      allow create: if incoming().keys().hasAny(['to', 'body']);
+      allow read, update, delete: if isStaff();
     }
 
     // --- Staff Management ---
