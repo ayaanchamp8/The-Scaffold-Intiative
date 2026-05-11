@@ -36,7 +36,9 @@ import {
   db, 
   auth, 
   googleProvider, 
-  signInWithPopup, 
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   User
 } from "./lib/firebase";
@@ -292,6 +294,9 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"inquiries" | "staff">("inquiries");
   const [filter, setFilter] = useState<string>("all");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const [showRoleInfo, setShowRoleInfo] = useState(false);
 
@@ -358,25 +363,56 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     };
   }, [userRole]);
 
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     if (isSigningIn) return;
-    
     setIsSigningIn(true);
     setAuthError(null);
-    
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
-      console.error("Sign in failed", err);
-      // Specific handling for common popup errors in iframe/development environments
+      console.error("Google sign in failed", err);
       if (err.code === 'auth/cancelled-popup-request') {
         setAuthError("Sign-in process was interrupted. This can happen if multiple clicks occur or if the request timed out. Please try again.");
       } else if (err.code === 'auth/popup-blocked') {
         setAuthError("The sign-in popup was blocked by your browser. Please enable popups for this site and try again.");
       } else if (err.code === 'auth/popup-closed-by-user') {
         setAuthError("Sign-in was cancelled because the window was closed.");
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setAuthError("This domain is not authorized for Google Sign-In. Please use Email/Password sign-in instead.");
       } else {
         setAuthError(`Sign-in failed: ${err.message || 'Unknown error'}`);
+      }
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSigningIn) return;
+    if (!email || !password) {
+      setAuthError("Please enter both email and password.");
+      return;
+    }
+    
+    setIsSigningIn(true);
+    setAuthError(null);
+    try {
+      if (isRegistering) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+    } catch (err: any) {
+      console.error("Email auth failed", err);
+      if (err.code === 'auth/invalid-credential') {
+        setAuthError("Invalid email or password.");
+      } else if (err.code === 'auth/email-already-in-use') {
+        setAuthError("An account with this email already exists. Try signing in.");
+      } else if (err.code === 'auth/weak-password') {
+        setAuthError("Password should be at least 6 characters.");
+      } else {
+        setAuthError(`Auth failed: ${err.message || 'Unknown error'}`);
       }
     } finally {
       setIsSigningIn(false);
@@ -482,9 +518,56 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             Sign in to manage the Scaffold Initiative global network.
           </p>
           
+          <form onSubmit={handleEmailAuth} className="flex flex-col gap-4 mb-6">
+            <input 
+              type="email" 
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="px-6 py-4 bg-brand-cream/50 border border-brand-plum/10 rounded-2xl outline-none focus:border-brand-plum/30 transition-colors text-sm font-medium"
+              required
+            />
+            <input 
+              type="password" 
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="px-6 py-4 bg-brand-cream/50 border border-brand-plum/10 rounded-2xl outline-none focus:border-brand-plum/30 transition-colors text-sm font-medium"
+              required
+            />
+            <button 
+              type="submit"
+              disabled={isSigningIn}
+              className="w-full py-4 bg-brand-plum text-brand-cream rounded-2xl font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {isSigningIn ? (
+                <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+              ) : (
+                isRegistering ? "Create Account" : "Sign In with Email"
+              )}
+            </button>
+            <button 
+              type="button" 
+              onClick={() => setIsRegistering(!isRegistering)}
+              className="text-xs text-brand-charcoal/50 font-bold hover:text-brand-plum transition-colors mt-2"
+            >
+              {isRegistering ? "Already have an account? Sign In" : "Need an account? Register"}
+            </button>
+          </form>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-brand-plum/10"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-4 bg-white text-brand-charcoal/40 font-bold uppercase tracking-widest">or</span>
+            </div>
+          </div>
+
           <button 
+            type="button"
             disabled={isSigningIn}
-            onClick={handleSignIn}
+            onClick={handleGoogleSignIn}
             className="w-full py-5 bg-white border-2 border-brand-plum/10 text-brand-plum rounded-2xl font-bold text-sm flex items-center justify-center gap-4 hover:bg-brand-cream hover:border-brand-plum/30 transition-all shadow-sm cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSigningIn ? (
