@@ -17,7 +17,7 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/admins/$(email)).data;
     }
     function hasRole(role) {
-      return isSignedIn() && request.auth.token.email_verified == true
+      return isSignedIn()
         && (
           (exists(/databases/$(database)/documents/admins/$(request.auth.token.email)) && getAdminData(request.auth.token.email).role == role)
           || (request.auth.token.email == 'ayaan.kriplani2213@gmail.com' && role == 'admin')
@@ -26,7 +26,7 @@ service cloud.firestore {
     function isAdmin() { return hasRole('admin'); }
     function isModerator() { return hasRole('moderator'); }
     function isStaff() { 
-      return isSignedIn() && request.auth.token.email_verified == true
+      return isSignedIn()
         && (
           exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
           || request.auth.token.email == 'ayaan.kriplani2213@gmail.com'

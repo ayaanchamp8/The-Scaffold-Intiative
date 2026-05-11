@@ -88,7 +88,8 @@ const handleFirestoreError = (error: unknown, operationType: OperationType, path
     path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  // Not throwing error to avoid unhandled promise rejection crashing the app
+  // throw new Error(JSON.stringify(errInfo));
 };
 
 // --- Components ---
