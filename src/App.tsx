@@ -305,10 +305,11 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
       setUser(u);
       if (u && u.email) {
         try {
-          const adminDoc = await getDoc(doc(db, 'admins', u.email));
+          const emailForCheck = u.email.toLowerCase();
+          const adminDoc = await getDoc(doc(db, 'admins', emailForCheck));
           if (adminDoc.exists()) {
             setUserRole(adminDoc.data().role);
-          } else if (u.email === 'ayaan.kriplani2213@gmail.com') {
+          } else if (emailForCheck === 'ayaan.kriplani2213@gmail.com') {
             setUserRole('admin');
           } else {
             setUserRole(null);

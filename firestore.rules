@@ -14,13 +14,13 @@ service cloud.firestore {
     
     // Auth helpers
     function getAdminData(email) {
-      return get(/databases/$(database)/documents/admins/$(email)).data;
+      return get(/databases/$(database)/documents/admins/$(email.lower())).data;
     }
     function hasRole(role) {
       return isSignedIn()
         && (
-          (exists(/databases/$(database)/documents/admins/$(request.auth.token.email)) && getAdminData(request.auth.token.email).role == role)
-          || (request.auth.token.email == 'ayaan.kriplani2213@gmail.com' && role == 'admin')
+          (exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) && getAdminData(request.auth.token.email.lower()).role == role)
+          || (request.auth.token.email.lower() == 'ayaan.kriplani2213@gmail.com' && role == 'admin')
         );
     }
     function isAdmin() { return hasRole('admin'); }
@@ -28,8 +28,8 @@ service cloud.firestore {
     function isStaff() { 
       return isSignedIn()
         && (
-          exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
-          || request.auth.token.email == 'ayaan.kriplani2213@gmail.com'
+          exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()))
+          || request.auth.token.email.lower() == 'ayaan.kriplani2213@gmail.com'
         );
     }
 
@@ -79,7 +79,7 @@ service cloud.firestore {
           && data.role in ['admin', 'moderator'];
       }
 
-      allow read: if isSignedIn() && (request.auth.token.email == email || isStaff());
+      allow read: if isSignedIn() && (request.auth.token.email.lower() == email.lower() || isStaff());
       allow create, update, delete: if isAdmin() && isValidStaff(incoming());
     }
   }
