@@ -321,12 +321,10 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     try {
       const formalizedMessage = `Thank you for contacting The Scaffold Initiative. We are thrilled at the prospect of working with you. We will review your inquiry and get back to you shortly. Please note that this chat will serve as our primary platform for communication.`;
       
-      if (inquiry.whatsapp) {
+      if (inquiry.whatsapp && inquiry.whatsapp.replace(/[^0-9]/g, '').length > 5) {
         const cleanWA = inquiry.whatsapp.replace(/[^0-9]/g, '');
-        window.open(`https://wa.me/${cleanWA}?text=${encodeURIComponent("Hi " + inquiry.name + ",\n\n" + formalizedMessage)}`, '_blank');
-      }
-      
-      if (inquiry.email) {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Hi " + inquiry.name + ",\n\n" + formalizedMessage)}&phone=${cleanWA}`, '_blank');
+      } else if (inquiry.email) {
         window.open(`mailto:${inquiry.email}?subject=${encodeURIComponent("Thank you for contacting The Scaffold Initiative")}&body=${encodeURIComponent("Hi " + inquiry.name + ",\n\n" + formalizedMessage)}`, '_blank');
       }
 
