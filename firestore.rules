@@ -39,6 +39,7 @@ service cloud.firestore {
         return data.keys().hasAll(['name', 'email', 'whatsapp', 'message', 'status', 'createdAt'])
           && data.name is string
           && (!('org' in data) || data.org is string)
+          && (!('type' in data) || data.type is string)
           && data.email is string
           && data.whatsapp is string
           && data.message is string

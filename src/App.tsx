@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
 import { 
   Globe, 
   Users, 
@@ -29,8 +30,10 @@ import {
   Filter,
   Trash2,
   ExternalLink,
+  Download,
   MessageCircle,
-  LogIn
+  LogIn,
+  Instagram
 } from "lucide-react";
 import { 
   db, 
@@ -39,6 +42,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   User
 } from "./lib/firebase";
@@ -96,192 +100,6 @@ const handleFirestoreError = (error: unknown, operationType: OperationType, path
 
 // --- Components ---
 
-const PartnerModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    org: "",
-    email: "",
-    whatsapp: "",
-    message: ""
-  });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setStatus("loading");
-    setErrorMessage("");
-
-    try {
-      console.log("Submitting inquiry to Firestore", formData);
-      const inquiryPayload = {
-        name: formData.name,
-        org: formData.org || "",
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        message: formData.message,
-        status: "new",
-        createdAt: serverTimestamp(),
-      };
-      
-      await addDoc(collection(db, 'inquiries'), inquiryPayload);
-
-      console.log("Inquiry submitted successfully via Firestore");
-      
-      setStatus("success");
-      setTimeout(() => {
-        onClose();
-        setStatus("idle");
-        setFormData({ name: "", org: "", email: "", whatsapp: "", message: "" });
-      }, 3000);
-    } catch (err: any) {
-      console.error("Submission failed", err);
-      setStatus("error");
-      setErrorMessage(err.message || "Failed to send inquiry. Please check your connection and try again.");
-    }
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-brand-charcoal/40 backdrop-blur-sm" 
-          />
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-brand-white rounded-[2.5rem] shadow-2xl relative"
-          >
-            <div className="p-6 md:p-8 text-center pt-8 md:pt-10">
-              <button 
-                onClick={onClose}
-                className="absolute top-4 right-4 md:top-6 md:right-6 p-2 hover:bg-brand-pink-light rounded-full transition-colors group cursor-pointer"
-              >
-                <X className="w-5 h-5 text-brand-plum group-hover:rotate-90 transition-transform" />
-              </button>
-              
-              <div className="mb-6">
-                <span className="text-[10px] font-bold tracking-[3px] uppercase text-brand-pink mb-2 block">Take Action</span>
-                <h3 className="text-2xl md:text-3xl font-display tracking-tight text-brand-plum">Partner With Us</h3>
-                <p className="text-brand-charcoal/50 mt-2 text-xs font-medium px-2">Join our global network to support neurodivergent inclusion.</p>
-              </div>
-
-              {status === "success" ? (
-                <div className="py-8 text-center">
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"
-                  >
-                    <CheckCircle2 className="w-8 h-8" />
-                  </motion.div>
-                  <h4 className="text-xl font-bold text-brand-plum mb-2">Thank You!</h4>
-                  <p className="text-brand-charcoal/60 text-xs md:text-sm">We have received your message and will get back to you shortly.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 text-left">
-                  <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Full Name</label>
-                    <input 
-                      required
-                      disabled={status === "loading"}
-                      type="text" 
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      placeholder="Enter your name"
-                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 md:gap-4">
-                    <div>
-                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Organization</label>
-                      <input 
-                        disabled={status === "loading"}
-                        type="text" 
-                        value={formData.org}
-                        onChange={(e) => setFormData({...formData, org: e.target.value})}
-                        placeholder="Organization"
-                        className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">WhatsApp / Phone</label>
-                      <input 
-                        required
-                        disabled={status === "loading"}
-                        type="tel" 
-                        value={formData.whatsapp}
-                        onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                        placeholder="+91 XXXXX"
-                        className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">Work Email</label>
-                    <input 
-                      required
-                      disabled={status === "loading"}
-                      type="email" 
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="email@example.com"
-                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all disabled:opacity-50"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-1 block px-2">How you'd like to help</label>
-                    <textarea 
-                      required
-                      disabled={status === "loading"}
-                      rows={2}
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      placeholder="Tell us about the collaboration..."
-                      className="w-full px-4 py-3 bg-brand-cream border border-brand-plum/5 rounded-2xl md:rounded-[1.5rem] focus:outline-none focus:border-brand-pink/30 text-sm font-medium transition-all resize-none disabled:opacity-50"
-                    />
-                  </div>
-                  
-                  {status === "error" && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-bold">
-                      {errorMessage}
-                    </div>
-                  )}
-
-                  <button 
-                    disabled={status === "loading"}
-                    type="submit"
-                    className="w-full py-5 bg-brand-plum text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-charcoal transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {status === "loading" ? (
-                      <>Processing... <Loader2 className="w-4 h-4 animate-spin" /></>
-                    ) : (
-                      <>Send Inquiry <Send className="w-4 h-4" /></>
-                    )}
-                  </button>
-                </form>
-              )}
-            </div>
-            
-            <div className="bg-brand-pink-light/30 p-6 text-center border-t border-brand-plum/5">
-              <p className="text-[10px] font-black text-brand-plum/30 uppercase tracking-[2px]">
-                Inquiry will be sent automatically
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-};
-
 // --- Admin Portal ---
 
 const AdminPortal = ({ onExit }: { onExit: () => void }) => {
@@ -292,8 +110,9 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
   const [loading, setLoading] = useState(true);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"inquiries" | "staff">("inquiries");
+  const [activeTab, setActiveTab] = useState<"inquiries" | "staff" | "dashboard">("dashboard");
   const [filter, setFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "status-asc" | "status-desc">("date-desc");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -388,7 +207,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     }
   };
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: FormEvent) => {
     e.preventDefault();
     if (isSigningIn) return;
     if (!email || !password) {
@@ -420,6 +239,20 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setAuthError("Please enter your email address first.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setAuthError("Password reset email sent! Please check your inbox.");
+    } catch (err: any) {
+      console.error("Password reset failed", err);
+      setAuthError(`Failed to send reset email: ${err.message || 'Unknown error'}`);
+    }
+  };
+
   const handleSignOut = () => auth.signOut();
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
@@ -429,6 +262,22 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, path);
     }
+  };
+
+  
+  const handleExportCSV = () => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Date,Name,Email,WhatsApp,Type,Organization,Status,Message\n";
+    inquiries.forEach(row => {
+      const msg = row.message ? row.message.replace(/\"/g, '""').replace(/\n/g, ' ') : "";
+      csvContent += `"${row.createdAt}","${row.name}","${row.email}","${row.whatsapp || ''}","${row.type || ''}","${row.org || ''}","${row.status || ''}","${msg}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "inquiries_export.csv");
+    document.body.appendChild(link);
+    link.click();
   };
 
   const handleDelete = async (id: string) => {
@@ -488,14 +337,49 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
   };
 
   const filteredInquiries = useMemo(() => {
-    if (filter === "all") return inquiries;
-    return inquiries.filter(i => i.status === filter);
-  }, [inquiries, filter]);
+    let result = filter === "all" ? [...inquiries] : inquiries.filter(i => i.status === filter);
+    result.sort((a, b) => {
+      // CreatedAt is formatted as localized string. We should ideally parse it back? 
+      // Wait, in Firebase it's a ToDate().toLocaleString(). 
+      // Actually to sort date properly, we should use the string as best effort or raw createdAt.
+      // Wait, we need to make sure createdAt can be sorted. Let's see what is inside 'inquiries'.
+      const dateA = a.createdAt === "Pending..." ? new Date() : new Date(a.createdAt);
+      const dateB = b.createdAt === "Pending..." ? new Date() : new Date(b.createdAt);
+      const timeA = dateA.getTime() || 0;
+      const timeB = dateB.getTime() || 0;
+
+      if (sortBy === "date-desc") {
+        return timeB - timeA;
+      }
+      if (sortBy === "date-asc") {
+        return timeA - timeB;
+      }
+      if (sortBy === "status-asc") {
+        return (a.status || "").localeCompare(b.status || "");
+      }
+      if (sortBy === "status-desc") {
+        return (b.status || "").localeCompare(a.status || "");
+      }
+      return 0;
+    });
+    return result;
+  }, [inquiries, filter, sortBy]);
+
+  const dashboardStats = useMemo(() => {
+    const types: Record<string, number> = {};
+    inquiries.forEach(i => {
+      const type = i.type || 'Other';
+      types[type] = (types[type] || 0) + 1;
+    });
+    return Object.keys(types).map(k => ({ name: k.charAt(0).toUpperCase() + k.slice(1), value: types[k] }));
+  }, [inquiries]);
+
+  const COLORS = ['#F5AFC3', '#7FC7D3', '#A8B987', '#A2D5F2', '#C8E6C9', '#F7F7F4'];
 
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-brand-plum animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-charcoal animate-spin" />
       </div>
     );
   }
@@ -506,16 +390,16 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md bg-white p-12 rounded-[3.5rem] shadow-2xl text-center border border-brand-plum/10 relative overflow-hidden"
+          className="w-full max-w-md bg-white p-12 rounded-[3.5rem] shadow-sm text-center  relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 w-full h-2 bg-brand-pink" />
           
-          <div className="w-24 h-24 bg-brand-cream rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-inner border border-brand-plum/5">
-            <div className="w-12 h-12 bg-brand-plum rounded-xl flex items-center justify-center font-display font-black text-2xl text-brand-cream">S</div>
+          <div className="w-24 h-24 bg-brand-cream rounded-[2rem] flex items-center justify-center mx-auto mb-10  ">
+            <div className="w-12 h-12 bg-brand-pink rounded-[1.5rem] flex items-center justify-center font-display font-black text-2xl text-brand-charcoal">S</div>
           </div>
           
-          <h2 className="text-4xl font-display text-brand-plum mb-4 tracking-tighter">Staff Access</h2>
-          <p className="text-brand-charcoal/50 mb-12 font-medium px-4">
+          <h2 className="text-4xl font-display text-brand-charcoal mb-4 tracking-tighter">Staff Access</h2>
+          <p className="text-brand-charcoal mb-12 font-medium px-4">
             Sign in to manage the Scaffold Initiative global network.
           </p>
           
@@ -525,7 +409,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="px-6 py-4 bg-brand-cream/50 border border-brand-plum/10 rounded-2xl outline-none focus:border-brand-plum/30 transition-colors text-sm font-medium"
+              className="px-6 py-4 bg-brand-cream/50  rounded-[2rem] outline-none focus: transition-colors text-sm font-medium"
               required
             />
             <input 
@@ -533,13 +417,24 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="px-6 py-4 bg-brand-cream/50 border border-brand-plum/10 rounded-2xl outline-none focus:border-brand-plum/30 transition-colors text-sm font-medium"
+              className="px-6 py-4 bg-brand-cream/50  rounded-[2rem] outline-none focus: transition-colors text-sm font-medium"
               required
             />
+            <div className="text-right">
+              {!isRegistering && (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-xs text-brand-charcoal font-bold hover:underline"
+                >
+                  Forgot your password?
+                </button>
+              )}
+            </div>
             <button 
               type="submit"
               disabled={isSigningIn}
-              className="w-full py-4 bg-brand-plum text-brand-cream rounded-2xl font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full py-4 bg-brand-pink text-brand-charcoal rounded-[2rem] font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {isSigningIn ? (
                 <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -550,7 +445,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             <button 
               type="button" 
               onClick={() => setIsRegistering(!isRegistering)}
-              className="text-xs text-brand-charcoal/50 font-bold hover:text-brand-plum transition-colors mt-2"
+              className="text-xs text-brand-charcoal font-bold hover:text-brand-charcoal transition-colors mt-2"
             >
               {isRegistering ? "Already have an account? Sign In" : "Need an account? Register"}
             </button>
@@ -558,10 +453,10 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-brand-plum/10"></div>
+              <div className="w-full border-t "></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-4 bg-white text-brand-charcoal/40 font-bold uppercase tracking-widest">or</span>
+              <span className="px-4 bg-white text-brand-charcoal font-bold uppercase tracking-widest">or</span>
             </div>
           </div>
 
@@ -569,10 +464,10 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             type="button"
             disabled={isSigningIn}
             onClick={handleGoogleSignIn}
-            className="w-full py-5 bg-white border-2 border-brand-plum/10 text-brand-plum rounded-2xl font-bold text-sm flex items-center justify-center gap-4 hover:bg-brand-cream hover:border-brand-plum/30 transition-all shadow-sm cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-white border-2  text-brand-charcoal rounded-[2rem] font-bold text-sm flex items-center justify-center gap-4 hover:bg-brand-cream hover: transition-all shadow-sm cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSigningIn ? (
-              <Loader2 className="w-5 h-5 animate-spin text-brand-plum" />
+              <Loader2 className="w-5 h-5 animate-spin text-brand-charcoal" />
             ) : (
               <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -588,17 +483,17 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[10px] font-bold leading-relaxed"
+              className="mt-6 p-4 bg-red-50 border border-red-100 rounded-[2rem] text-red-600 text-[10px] font-bold leading-relaxed"
             >
               {authError}
             </motion.div>
           )}
 
           <div className="mt-12 flex flex-col items-center gap-6">
-            <div className="h-px w-8 bg-brand-plum/10" />
+            <div className="h-px w-8 bg-brand-pink/10" />
             <button 
               onClick={onExit}
-              className="text-xs font-black text-brand-plum/30 uppercase tracking-[0.2em] hover:text-brand-pink transition-colors cursor-pointer"
+              className="text-xs font-black text-brand-charcoal uppercase tracking-[0.2em] hover:text-brand-pink transition-colors cursor-pointer"
             >
               Back to Home
             </button>
@@ -614,20 +509,20 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg bg-white p-12 md:p-16 rounded-[4rem] shadow-2xl text-center border border-brand-plum/10"
+          className="w-full max-w-lg bg-white p-12 md:p-16 rounded-[4rem] shadow-sm text-center "
         >
           <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-10 border border-red-100">
             <ShieldCheck className="w-10 h-10" />
           </div>
           
-          <h2 className="text-4xl font-display text-brand-plum mb-6 tracking-tighter">Access Denied</h2>
+          <h2 className="text-4xl font-display text-brand-charcoal mb-6 tracking-tighter">Access Denied</h2>
           
-          <div className="bg-brand-cream/50 p-8 rounded-3xl border border-brand-plum/5 mb-10 text-left">
-            <p className="text-sm text-brand-charcoal/60 mb-6 font-medium leading-relaxed">
+          <div className="bg-brand-cream/50 p-8 rounded-3xl  mb-10 text-left">
+            <p className="text-sm text-brand-charcoal mb-6 font-medium leading-relaxed">
               Your account <strong>{user?.email}</strong> is not yet authorized.
             </p>
             <div className="space-y-4">
-              <p className="text-[11px] text-brand-plum/60 font-medium">
+              <p className="text-[11px] text-brand-charcoal font-medium">
                 An administrator must add your email address to the authorized staff list to grant you access.
               </p>
             </div>
@@ -636,13 +531,13 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
           <div className="flex flex-col gap-4">
             <button 
               onClick={handleSignOut}
-              className="w-full py-5 bg-brand-plum text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-charcoal transition-all shadow-lg cursor-pointer"
+              className="w-full py-5 bg-brand-pink text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all shadow-sm cursor-pointer"
             >
               Sign Out & Try Again
             </button>
             <button 
               onClick={onExit}
-              className="py-5 text-xs font-black text-brand-plum/40 uppercase tracking-widest hover:text-brand-plum transition-colors cursor-pointer"
+              className="py-5 text-xs font-black text-brand-charcoal uppercase tracking-widest hover:text-brand-charcoal transition-colors cursor-pointer"
             >
               Return Home
             </button>
@@ -653,11 +548,11 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcf9f8] text-brand-plum font-sans flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#fcf9f8] text-brand-charcoal font-sans flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="w-full md:w-80 bg-brand-plum text-brand-cream p-8 md:min-h-screen flex flex-col border-r border-white/5">
+      <div className="w-full md:w-80 bg-brand-blue/20 text-brand-charcoal p-8 md:min-h-screen flex flex-col border-r ">
         <div className="flex items-center gap-3 mb-16">
-          <div className="w-10 h-10 bg-brand-cream rounded-xl flex items-center justify-center font-display font-black text-xl text-brand-plum">S</div>
+          <div className="w-10 h-10 bg-brand-cream rounded-[1.5rem] flex items-center justify-center font-display font-black text-xl text-brand-charcoal">S</div>
           <div>
             <h1 className="font-display font-black text-lg tracking-tight uppercase leading-none">Scaffold</h1>
             <p className="text-[10px] font-black opacity-40 uppercase tracking-widest mt-1">Admin Panel</p>
@@ -668,7 +563,9 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
           <div className="mb-4">
             <p className="text-[10px] font-black opacity-30 uppercase tracking-[2px] px-6 mb-2">Inquiries</p>
             {[
-              { id: 'all', label: 'All Inquiries', icon: <LayoutDashboard className="w-4 h-4" /> },
+              
+              { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+              { id: 'all', label: 'All Inquiries', icon: <MessageSquare className="w-4 h-4" /> },
               { id: 'new', label: 'New', icon: <Sparkles className="w-4 h-4" /> },
               { id: 'contacted', label: 'Contacted', icon: <MessageCircle className="w-4 h-4" /> },
               { id: 'archived', label: 'Archived', icon: <Trash2 className="w-4 h-4" /> }
@@ -676,7 +573,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               <button
                 key={item.id}
                 onClick={() => { setActiveTab("inquiries"); setFilter(item.id); }}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all ${activeTab === "inquiries" && filter === item.id ? 'bg-brand-pink text-brand-plum' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "inquiries" && filter === item.id ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
               >
                 {item.icon} {item.label}
               </button>
@@ -688,7 +585,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               <p className="text-[10px] font-black opacity-30 uppercase tracking-[2px] px-6 mb-2 mt-8">Administration</p>
               <button
                 onClick={() => setActiveTab("staff")}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all ${activeTab === "staff" ? 'bg-brand-pink text-brand-plum' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "staff" ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
               >
                 <Users className="w-4 h-4" /> Staff Management
               </button>
@@ -696,9 +593,9 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
           )}
         </nav>
 
-        <div className="mt-auto pt-8 border-t border-white/10">
+        <div className="mt-auto pt-8 border-t ">
           <div className="flex items-center gap-4 mb-6">
-            <img src={user.photoURL || ""} alt="" className="w-10 h-10 rounded-full border border-white/20" />
+            <img src={user.photoURL || ""} alt="" className="w-10 h-10 rounded-full " />
             <div className="overflow-hidden">
               <p className="text-xs font-bold truncate">{user.displayName}</p>
               <p className="text-[10px] opacity-40 truncate">{user.email}</p>
@@ -707,19 +604,19 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
           <div className="space-y-2">
             <button 
               onClick={() => setShowRoleInfo(true)}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all cursor-pointer"
             >
               <Info className="w-4 h-4" /> Role Permissions
             </button>
             <button 
               onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer"
             >
               <LogOut className="w-4 h-4" /> Logout
             </button>
             <button 
               onClick={onExit}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-pink transition-all text-white cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-brand-pink transition-all text-brand-charcoal cursor-pointer"
             >
               Exit Admin
             </button>
@@ -730,29 +627,29 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
       {/* Role Info Modal */}
       <AnimatePresence>
         {showRoleInfo && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-brand-charcoal/60 backdrop-blur-md">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-brand-charcoal/40">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]"
+              className="w-full max-w-2xl bg-white rounded-[3rem] shadow-sm relative overflow-hidden flex flex-col max-h-[80vh]"
             >
-              <div className="p-10 border-b border-brand-plum/5">
+              <div className="p-10 border-b ">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-cream rounded-2xl flex items-center justify-center">
-                      <ShieldCheck className="w-6 h-6 text-brand-plum" />
+                    <div className="w-12 h-12 bg-brand-cream rounded-[2rem] flex items-center justify-center">
+                      <ShieldCheck className="w-6 h-6 text-brand-charcoal" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-display font-bold text-brand-plum">Access Roles</h3>
-                      <p className="text-xs text-brand-charcoal/40 font-medium">System Permission Overview</p>
+                      <h3 className="text-2xl font-display font-bold text-brand-charcoal">Access Roles</h3>
+                      <p className="text-xs text-brand-charcoal font-medium">System Permission Overview</p>
                     </div>
                   </div>
                   <button 
                     onClick={() => setShowRoleInfo(false)}
                     className="p-2 hover:bg-brand-cream rounded-full transition-colors cursor-pointer"
                   >
-                    <X className="w-6 h-6 text-brand-plum" />
+                    <X className="w-6 h-6 text-brand-charcoal" />
                   </button>
                 </div>
               </div>
@@ -762,8 +659,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                   {/* Admin Power */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-brand-plum text-white rounded-lg flex items-center justify-center font-bold text-xs shadow-lg">A</div>
-                      <h4 className="font-bold text-brand-plum">Administrator</h4>
+                      <div className="w-8 h-8 bg-brand-pink text-brand-charcoal rounded-lg flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                      <h4 className="font-bold text-brand-charcoal">Administrator</h4>
                     </div>
                     <ul className="space-y-4">
                       {[
@@ -774,8 +671,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                         "Assign roles (Admin/Moderator) to staff",
                         "Complete system control"
                       ].map((p, i) => (
-                        <li key={i} className="flex gap-3 text-xs font-medium text-brand-charcoal/60">
-                          <CheckCircle2 className="w-4 h-4 text-brand-plum flex-shrink-0 mt-0.5" />
+                        <li key={i} className="flex gap-3 text-xs font-medium text-brand-charcoal">
+                          <CheckCircle2 className="w-4 h-4 text-brand-charcoal flex-shrink-0 mt-0.5" />
                           {p}
                         </li>
                       ))}
@@ -785,8 +682,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                   {/* Moderator Power */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-brand-pink text-brand-plum rounded-lg flex items-center justify-center font-bold text-xs shadow-md">M</div>
-                      <h4 className="font-bold text-brand-plum">Moderator</h4>
+                      <div className="w-8 h-8 bg-brand-pink text-brand-charcoal rounded-lg flex items-center justify-center font-bold text-xs shadow-sm">M</div>
+                      <h4 className="font-bold text-brand-charcoal">Moderator</h4>
                     </div>
                     <ul className="space-y-4">
                       {[
@@ -796,8 +693,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                         "No access to Staff Management",
                         "Cannot add or remove other users"
                       ].map((p, i) => (
-                        <li key={i} className="flex gap-3 text-xs font-medium text-brand-charcoal/60">
-                          <CheckCircle2 className="w-4 h-4 text-brand-plum flex-shrink-0 mt-0.5" />
+                        <li key={i} className="flex gap-3 text-xs font-medium text-brand-charcoal">
+                          <CheckCircle2 className="w-4 h-4 text-brand-charcoal flex-shrink-0 mt-0.5" />
                           {p}
                         </li>
                       ))}
@@ -805,8 +702,8 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                   </div>
                 </div>
 
-                <div className="p-6 bg-brand-cream/50 rounded-2xl border border-brand-plum/5">
-                  <p className="text-[10px] text-brand-plum/40 font-bold uppercase tracking-widest leading-relaxed">
+                <div className="p-6 bg-brand-cream/50 rounded-[2rem] ">
+                  <p className="text-[10px] text-brand-charcoal font-bold uppercase tracking-widest leading-relaxed">
                     Access is granted solely by existing Administrators. Every staff action is logged for system integrity.
                   </p>
                 </div>
@@ -818,25 +715,122 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
 
       {/* Main Content */}
       <main className="flex-grow p-6 md:p-12 overflow-y-auto">
-        {activeTab === "inquiries" ? (
+        
+        {activeTab === "dashboard" ? (
           <>
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
               <div>
-                <h2 className="text-4xl md:text-5xl font-display tracking-tighter text-brand-plum">
+                <h2 className="text-4xl md:text-5xl font-display tracking-tighter text-brand-charcoal">Dashboard</h2>
+                <p className="text-brand-charcoal font-medium mt-2">Overview of network and inquiries.</p>
+              </div>
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-6 py-3 bg-brand-pink text-brand-charcoal font-bold uppercase tracking-widest text-xs rounded-full hover:bg-brand-blue transition-all shadow-sm"
+              >
+                <Download className="w-4 h-4" /> Export CSV
+              </button>
+            </header>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <div className="bg-white p-6 rounded-3xl shadow-sm">
+                 <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Total Inquiries</p>
+                 <p className="text-4xl font-display text-brand-charcoal">{inquiries.length}</p>
+              </div>
+              <div className="bg-white p-6 rounded-3xl shadow-sm">
+                 <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">New</p>
+                 <p className="text-4xl font-display text-brand-pink">{inquiries.filter(i => i.status === 'new').length}</p>
+              </div>
+              <div className="bg-white p-6 rounded-3xl shadow-sm">
+                 <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Contacted</p>
+                 <p className="text-4xl font-display text-brand-green">{inquiries.filter(i => i.status === 'contacted').length}</p>
+              </div>
+              <div className="bg-white p-6 rounded-3xl shadow-sm">
+                 <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Staff Members</p>
+                 <p className="text-4xl font-display text-brand-green">{staff.length || 1}</p>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+               <div className="bg-white p-8 rounded-[2.5rem] shadow-sm">
+                 <h3 className="font-bold text-lg mb-6 text-brand-charcoal">Inquiries By Type</h3>
+                 {inquiries.length > 0 ? (
+                   <div className="h-64">
+                     <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={dashboardStats}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            stroke="none"
+                          >
+                            {dashboardStats.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip 
+                             contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          />
+                          <Legend />
+                        </PieChart>
+                     </ResponsiveContainer>
+                   </div>
+                 ) : (
+                   <div className="h-64 flex items-center justify-center text-sm font-medium text-brand-charcoal/50">No data available</div>
+                 )}
+               </div>
+               <div className="bg-brand-pink p-8 rounded-[2.5rem] shadow-sm text-brand-charcoal flex flex-col justify-center">
+                 <div className="w-16 h-16 bg-white rounded-[2rem] flex items-center justify-center mb-6">
+                    <Zap className="w-8 h-8 text-brand-pink" />
+                 </div>
+                 <h3 className="text-3xl font-display tracking-tight mb-4">Quick Actions</h3>
+                 <p className="font-medium text-sm mb-8 opacity-80">Navigate directly to the management sections or handle pending items.</p>
+                 <div className="flex flex-col gap-3">
+                   <button onClick={() => {setActiveTab('inquiries'); setFilter('new');}} className="px-6 py-4 bg-white rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Review New Inquiries ({inquiries.filter(i => i.status === 'new').length})</button>
+                   {userRole === 'admin' && (
+                     <button onClick={() => setActiveTab('staff')} className="px-6 py-4 bg-white rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Manage Staff</button>
+                   )}
+                 </div>
+               </div>
+            </div>
+          </>
+        ) : activeTab === "inquiries" ? (
+
+          <>
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-display tracking-tighter text-brand-charcoal">
                   {filter === 'all' ? 'All Inquiries' : `${filter.charAt(0).toUpperCase() + filter.slice(1)} Inquiries`}
                 </h2>
-                <p className="text-brand-charcoal/50 font-medium mt-2">Managing the future of neurodivergent inclusion.</p>
+                <p className="text-brand-charcoal font-medium mt-2">Managing the future of neurodivergent inclusion.</p>
               </div>
-              <div className="flex bg-white p-2 rounded-2xl shadow-sm border border-brand-plum/5">
-                <div className="px-6 py-3 border-r border-brand-plum/5">
-                    <p className="text-[10px] font-black text-brand-plum/30 uppercase tracking-widest mb-1">Total</p>
-                    <p className="text-xl font-display text-brand-plum">{inquiries.length}</p>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-2 rounded-[2rem] shadow-sm ">
+                <div className="flex">
+                  <div className="px-6 py-3 border-r border-brand-charcoal/10">
+                      <p className="text-[10px] font-black text-brand-charcoal uppercase tracking-widest mb-1">Total</p>
+                      <p className="text-xl font-display text-brand-charcoal">{inquiries.length}</p>
+                  </div>
+                  <div className="px-6 py-3">
+                      <p className="text-[10px] font-black text-brand-charcoal uppercase tracking-widest mb-1">New</p>
+                      <p className="text-xl font-display text-brand-pink">
+                        {inquiries.filter(i => i.status === 'new').length}
+                      </p>
+                  </div>
                 </div>
-                <div className="px-6 py-3">
-                    <p className="text-[10px] font-black text-brand-plum/30 uppercase tracking-widest mb-1">New Today</p>
-                    <p className="text-xl font-display text-brand-pink">
-                      {inquiries.filter(i => i.status === 'new').length}
-                    </p>
+                <div className="px-4 border-l border-brand-charcoal/10">
+                  <select 
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="bg-brand-cream/50 px-4 py-2 rounded-xl text-sm font-bold text-brand-charcoal outline-none border cursor-pointer border-transparent focus:border-brand-pink transition-all"
+                  >
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="status-asc">Status (A-Z)</option>
+                    <option value="status-desc">Status (Z-A)</option>
+                  </select>
                 </div>
               </div>
             </header>
@@ -850,9 +844,9 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                     className="py-32 text-center"
                   >
                     <div className="w-20 h-20 bg-brand-cream rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Filter className="w-10 h-10 text-brand-plum/20" />
+                      <Filter className="w-10 h-10 text-brand-charcoal" />
                     </div>
-                    <p className="text-brand-charcoal/40 font-bold uppercase tracking-widest text-sm">No inquiries found for this filter</p>
+                    <p className="text-brand-charcoal font-bold uppercase tracking-widest text-sm">No inquiries found for this filter</p>
                   </motion.div>
                 ) : (
                   filteredInquiries.map((inquiry) => (
@@ -862,45 +856,52 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.98 }}
-                      className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-brand-plum/5 group hover:border-brand-pink/30 hover:shadow-xl transition-all"
+                      className="bg-white p-8 rounded-[2.5rem] shadow-sm  group hover:border-brand-pink/30 hover:shadow-sm transition-all"
                     >
                       <div className="flex flex-col lg:flex-row gap-8">
                         <div className="flex-grow">
                           <div className="flex items-center gap-4 mb-4">
                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                              inquiry.status === 'new' ? 'bg-brand-pink-light text-brand-plum' :
+                              inquiry.status === 'new' ? 'bg-brand-blue/20 text-brand-charcoal' :
                               inquiry.status === 'contacted' ? 'bg-blue-50 text-blue-600' :
                               'bg-gray-100 text-gray-500'
                             }`}>
                               {inquiry.status}
                             </span>
-                            <div className="flex items-center gap-2 text-brand-charcoal/30 text-[10px] font-black uppercase tracking-widest">
+                            <div className="flex items-center gap-2 text-brand-charcoal text-[10px] font-black uppercase tracking-widest">
                               <Clock className="w-3 h-3" /> {inquiry.createdAt}
                             </div>
                           </div>
                           
-                          <h3 className="text-3xl font-display tracking-tight text-brand-plum mb-2">{inquiry.name}</h3>
+                          <h3 className="text-3xl font-display tracking-tight text-brand-charcoal mb-2">{inquiry.name}</h3>
                           <div className="flex flex-wrap gap-4 mb-8">
-                            <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal/60">
-                              <Building className="w-4 h-4 text-brand-pink" /> {inquiry.org || "Independent Individual"}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal/60">
+                            <div className="flex flex-col gap-1">
+   {inquiry.type && (
+     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-green mb-1">
+        Type: {inquiry.type}
+     </div>
+   )}
+   <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal">
+     <Building className="w-4 h-4 text-brand-pink" /> {inquiry.org || "Independent Individual"}
+   </div>
+</div>
+                            <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal">
                               <Mail className="w-4 h-4 text-brand-pink" /> 
-                              <a href={`mailto:${inquiry.email}`} className="hover:text-brand-plum transition-colors underline decoration-brand-rose/30">
+                              <a href={`mailto:${inquiry.email}`} className="hover:text-brand-charcoal transition-colors underline decoration-brand-rose/30">
                                 {inquiry.email}
                               </a>
                             </div>
-                            <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal/60">
+                            <div className="flex items-center gap-2 text-sm font-bold text-brand-charcoal">
                               <Phone className="w-4 h-4 text-brand-pink" /> 
-                              <a href={`https://wa.me/${inquiry.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand-plum transition-colors flex items-center gap-1 group/wa">
+                              <a href={`https://wa.me/${inquiry.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors flex items-center gap-1 group/wa">
                                 {inquiry.whatsapp} <ExternalLink className="w-3 h-3 opacity-0 group-hover/wa:opacity-100 transition-opacity" />
                               </a>
                             </div>
                           </div>
 
-                          <div className="bg-brand-cream/50 p-8 rounded-3xl border border-brand-plum/5">
-                            <h4 className="text-[10px] font-black text-brand-plum/40 uppercase tracking-widest mb-4">Inquiry Message</h4>
-                            <p className="text-brand-charcoal/80 font-medium leading-relaxed whitespace-pre-wrap">{inquiry.message}</p>
+                          <div className="bg-brand-cream/50 p-8 rounded-3xl ">
+                            <h4 className="text-[10px] font-black text-brand-charcoal uppercase tracking-widest mb-4">Inquiry Message</h4>
+                            <p className="text-brand-charcoal font-medium leading-relaxed whitespace-pre-wrap">{inquiry.message}</p>
                           </div>
                         </div>
 
@@ -908,7 +909,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                           {inquiry.status !== 'contacted' && (
                             <button 
                               onClick={() => handleSendInitialContact(inquiry)}
-                              className="flex-grow lg:flex-none py-4 bg-brand-pink text-brand-plum rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-brand-rose transition-all shadow-md cursor-pointer"
+                              className="flex-grow lg:flex-none py-4 bg-brand-pink text-brand-charcoal rounded-[2rem] text-xs font-black uppercase tracking-widest hover:bg-brand-blue transition-all shadow-sm cursor-pointer"
                             >
                               Send Initial Msg
                             </button>
@@ -916,7 +917,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                           {inquiry.status !== 'contacted' && (
                             <button 
                               onClick={() => handleUpdateStatus(inquiry.id, 'contacted')}
-                              className="flex-grow lg:flex-none py-4 bg-brand-plum text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-brand-charcoal transition-all shadow-md cursor-pointer"
+                              className="flex-grow lg:flex-none py-4 bg-brand-pink text-brand-charcoal rounded-[2rem] text-xs font-black uppercase tracking-widest hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all shadow-sm cursor-pointer"
                             >
                               Mark Contacted
                             </button>
@@ -924,7 +925,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                           {inquiry.status !== 'archived' && (
                             <button 
                               onClick={() => handleUpdateStatus(inquiry.id, 'archived')}
-                              className="flex-grow lg:flex-none py-4 bg-white border border-brand-plum/10 text-brand-plum rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all cursor-pointer"
+                              className="flex-grow lg:flex-none py-4 bg-white  text-brand-charcoal rounded-[2rem] text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all cursor-pointer"
                             >
                               Archive
                             </button>
@@ -932,7 +933,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                           {userRole === 'admin' && (
                             <button 
                               onClick={() => handleDelete(inquiry.id)}
-                              className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-red-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-4 bg-red-50 text-red-500 rounded-[2rem] hover:bg-red-500 hover:text-brand-charcoal transition-all cursor-pointer border border-red-100 disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
@@ -948,22 +949,22 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
         ) : (
           <>
             <header className="mb-12">
-              <h2 className="text-4xl md:text-5xl font-display tracking-tighter text-brand-plum">Staff Management</h2>
-              <p className="text-brand-charcoal/50 font-medium mt-2">Manage access and roles for the initiative's digital portal.</p>
+              <h2 className="text-4xl md:text-5xl font-display tracking-tighter text-brand-charcoal">Staff Management</h2>
+              <p className="text-brand-charcoal font-medium mt-2">Manage access and roles for the initiative's digital portal.</p>
             </header>
 
             <div className="grid lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2 space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-[3px] text-brand-plum/30 mb-6">Current Staff</h3>
+                <h3 className="text-[11px] font-black uppercase tracking-[3px] text-brand-charcoal mb-6">Current Staff</h3>
                 <div className="grid gap-4">
                   {staff.map(member => (
-                    <div key={member.id} className="bg-white p-8 rounded-[2.5rem] border border-brand-plum/5 flex items-center justify-between group hover:shadow-lg transition-all">
+                    <div key={member.id} className="bg-white p-8 rounded-[2.5rem]  flex items-center justify-between group hover:shadow-sm transition-all">
                       <div className="flex items-center gap-6">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white ${member.role === 'admin' ? 'bg-brand-plum' : 'bg-brand-pink'}`}>
+                        <div className={`w-12 h-12 rounded-[2rem] flex items-center justify-center font-bold text-brand-charcoal ${member.role === 'admin' ? 'bg-brand-pink' : 'bg-brand-pink'}`}>
                           {member.role === 'admin' ? 'A' : 'M'}
                         </div>
                         <div>
-                          <p className="font-bold text-brand-plum">{member.id}</p>
+                          <p className="font-bold text-brand-charcoal">{member.id}</p>
                           <div className="flex gap-4 mt-1">
                             <span className="text-[10px] font-black uppercase tracking-widest text-brand-pink">{member.role}</span>
                           </div>
@@ -971,7 +972,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                       </div>
                       <button 
                         onClick={() => handleRemoveStaff(member.id)}
-                        className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-red-100"
+                        className="p-3 bg-red-50 text-red-500 rounded-[1.5rem] hover:bg-red-500 hover:text-brand-charcoal transition-all cursor-pointer border border-red-100"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -980,24 +981,24 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                 </div>
               </div>
 
-              <div className="bg-white p-12 rounded-[3.5rem] shadow-xl border border-brand-plum/10 h-fit sticky top-12">
-                <h3 className="text-2xl font-display tracking-tight text-brand-plum mb-8">Add New Staff</h3>
+              <div className="bg-white p-12 rounded-[3.5rem] shadow-sm  h-fit sticky top-12">
+                <h3 className="text-2xl font-display tracking-tight text-brand-charcoal mb-8">Add New Staff</h3>
                 <form onSubmit={handleAddStaff} className="space-y-6">
                   <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">Email Address</label>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-charcoal mb-2 block">Email Address</label>
                     <input 
                       name="email"
                       type="email"
                       required
                       placeholder="staff@scaffold.org"
-                      className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-medium transition-all"
+                      className="w-full px-6 py-4 bg-brand-cream  rounded-[2rem] focus:outline-none focus:border-brand-pink/30 font-medium transition-all"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-plum/40 mb-2 block">Role</label>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-brand-charcoal mb-2 block">Role</label>
                     <select 
                       name="role"
-                      className="w-full px-6 py-4 bg-brand-cream border border-brand-plum/5 rounded-2xl focus:outline-none focus:border-brand-pink/30 font-bold transition-all appearance-none cursor-pointer"
+                      className="w-full px-6 py-4 bg-brand-cream  rounded-[2rem] focus:outline-none focus:border-brand-pink/30 font-bold transition-all appearance-none cursor-pointer"
                     >
                       <option value="moderator">Moderator</option>
                       <option value="admin">Administrator</option>
@@ -1005,7 +1006,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                   </div>
                   <button 
                     type="submit"
-                    className="w-full py-5 bg-brand-plum text-white rounded-full font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-brand-charcoal transition-all shadow-lg active:scale-95"
+                    className="w-full py-5 bg-brand-pink text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all shadow-sm active:scale-95"
                   >
                     Authorize User <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1018,25 +1019,35 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
     </div>
   );
 };
-const Navbar = ({ onOpenModal }: { onOpenModal: () => void }) => (
-  <nav className="fixed top-0 left-0 w-full z-50 bg-brand-cream/80 backdrop-blur-md border-b border-brand-plum/10">
+
+const Navbar = () => (
+  <nav className="fixed top-0 left-0 w-full z-50 bg-brand-cream/80 backdrop-blur-md border-b border-brand-charcoal/10">
     <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <div className="flex items-center gap-2 font-display text-brand-plum">
+      <div className="flex items-center gap-2 font-display text-brand-charcoal">
         <button 
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => (window as any).navigate('home')}
           className="flex items-center gap-2 group cursor-pointer"
         >
-          <div className="w-8 h-8 bg-brand-plum rounded-lg flex items-center justify-center font-bold text-brand-cream group-hover:scale-110 transition-transform">S</div>
-          <span className="font-bold text-xl tracking-tight text-brand-charcoal uppercase letter-spacing-[-0.5px]">The Scaffold Initiative</span>
+          <div className="w-8 h-8 bg-brand-pink rounded-lg flex items-center justify-center font-bold text-brand-charcoal group-hover:scale-110 transition-transform">S</div>
+          <span className="font-bold text-xl tracking-tight text-brand-charcoal uppercase letter-spacing-[-0.5px] hidden sm:block">The Scaffold Initiative</span>
         </button>
       </div>
-      <div className="hidden md:flex items-center gap-8 text-brand-plum">
-        <a href="#about" className="text-sm font-semibold hover:text-brand-pink transition-colors">About</a>
-        <a href="#impact" className="text-sm font-semibold hover:text-brand-pink transition-colors">Impact</a>
-        <a href="#model" className="text-sm font-semibold hover:text-brand-pink transition-colors">Model</a>
+      <div className="hidden md:flex items-center gap-8 text-brand-charcoal">
+        <button onClick={() => (window as any).navigate('about')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">About</button>
+        <button onClick={() => (window as any).navigate('impact')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Impact</button>
+        <button onClick={() => (window as any).navigate('model')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Model</button>
+        <button onClick={() => (window as any).navigate('team')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Core Team</button>
+        <a 
+          href="https://www.instagram.com/the.scaffold.initiative?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:text-brand-pink transition-colors"
+        >
+          <Instagram className="w-5 h-5" />
+        </a>
         <button 
-          onClick={onOpenModal}
-          className="px-6 py-2.5 bg-brand-plum text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-brand-charcoal transition-all hover:scale-105 cursor-pointer"
+          onClick={() => (window as any).navigate('partner')}
+          className="px-6 py-2.5 bg-brand-pink text-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all hover:scale-105 cursor-pointer"
         >
           Partner With Us
         </button>
@@ -1045,11 +1056,12 @@ const Navbar = ({ onOpenModal }: { onOpenModal: () => void }) => (
   </nav>
 );
 
-const Hero = ({ onOpenModal }: { onOpenModal: () => void }) => (
-  <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-brand-cream">
+const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => (
+  <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-brand-blue/10">
     {/* Decorative Elements */}
     <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-10 blur-3xl rounded-full" />
-    <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-rose opacity-20 blur-3xl rounded-full" />
+    <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-20 blur-3xl rounded-full" />
+    <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-brand-green opacity-20 blur-3xl rounded-full" />
     
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
       <div className="max-w-4xl">
@@ -1058,23 +1070,23 @@ const Hero = ({ onOpenModal }: { onOpenModal: () => void }) => (
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-block px-4 py-1.5 bg-brand-rose text-brand-plum text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
+          <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
             EST. FEB 2026
           </span>
-          <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-plum max-w-3xl tracking-tighter">
+          <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
             Redefining inclusion 
             <span className="block italic mt-2 opacity-90 font-display">for neurodivergent students</span>
           </h1>
-          <p className="text-lg md:text-xl text-brand-charcoal/80 mb-10 leading-relaxed max-w-2xl font-medium">
+          <p className="text-lg md:text-xl text-brand-charcoal mb-10 leading-relaxed max-w-2xl font-medium">
             Bridging the gap between diagnosis and support in Tier 2 and Tier 3 regions across India, Thailand, Spain, and the UAE. Providing structure and care where students need it most.
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="#impact" className="px-8 py-4 bg-brand-plum text-white rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-charcoal transition-all flex items-center gap-3 group shadow-xl shadow-brand-plum/10">
+            <button onClick={() => (window as any).navigate('impact')} className="px-8 py-4 bg-brand-pink text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all flex items-center gap-3 group shadow-sm shadow-brand-charcoal/10">
               View Impact <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
             <button 
-              onClick={onOpenModal}
-              className="px-8 py-4 border border-brand-plum text-brand-plum rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-plum hover:text-white transition-all cursor-pointer"
+              onClick={() => (window as any).navigate('partner')}
+              className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
             >
               Partner With Us
             </button>
@@ -1089,7 +1101,7 @@ const Hero = ({ onOpenModal }: { onOpenModal: () => void }) => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-brand-plum/10 py-12"
+        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y  py-12"
       >
         {[
           { label: "Countries Active", value: "4" },
@@ -1099,7 +1111,7 @@ const Hero = ({ onOpenModal }: { onOpenModal: () => void }) => (
         ].map((stat, i) => (
           <div key={i}>
             <p className="text-4xl md:text-5xl font-display font-bold text-brand-pink mb-2">{stat.value}</p>
-            <p className="text-[11px] font-bold text-brand-plum/60 uppercase tracking-[1px]">{stat.label}</p>
+            <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[1px]">{stat.label}</p>
           </div>
         ))}
       </motion.div>
@@ -1108,7 +1120,7 @@ const Hero = ({ onOpenModal }: { onOpenModal: () => void }) => (
 );
 
 const About = () => (
-  <section id="about" className="py-32 bg-brand-cream overflow-hidden">
+  <section id="about" className="py-32 bg-brand-mint/20 overflow-hidden">
     <div className="max-w-7xl mx-auto px-6">
       <div className="grid lg:grid-cols-2 gap-20 items-center">
         <motion.div
@@ -1118,25 +1130,25 @@ const About = () => (
            transition={{ duration: 0.8 }}
         >
           <div className="relative">
-            <div className="absolute -top-10 -left-10 w-64 h-64 bg-brand-rose rounded-full opacity-20 blur-2xl" />
+            <div className="absolute -top-10 -left-10 w-64 h-64 bg-brand-blue rounded-full opacity-20 blur-2xl" />
             <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">The Mission</span>
             <h2 className="text-4xl md:text-6xl mb-10 relative z-10 leading-tight tracking-tighter">Empowering students through academic and social inclusion.</h2>
-            <p className="text-lg text-brand-charcoal/80 mb-8 leading-relaxed font-medium">
+            <p className="text-lg text-brand-charcoal mb-8 leading-relaxed font-medium">
               Launched in February 2026, The Scaffold Initiative is a youth-led organization born from a critical observation: the "diagnostic cliff" between receiving a diagnosis and receiving actual support.
             </p>
-            <p className="text-lg text-brand-charcoal/80 mb-12 leading-relaxed font-medium">
+            <p className="text-lg text-brand-charcoal mb-12 leading-relaxed font-medium">
               We focus on academic inclusion for neurodivergent students in underserved Tier 2 and Tier 3 regions, ensuring that mental well-being is never an afterthought in the classroom.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-8 bg-white rounded-3xl shadow-sm border border-brand-plum/5">
+              <div className="p-8 bg-white rounded-3xl shadow-sm ">
                 <Users className="w-10 h-10 text-brand-pink mb-6" />
                 <h4 className="font-bold text-xl mb-3">Youth-Led Advocacy</h4>
-                <p className="text-brand-charcoal/60 leading-relaxed text-sm">Built and driven by those who understand the modern educational landscape from the inside.</p>
+                <p className="text-brand-charcoal leading-relaxed text-sm">Built and driven by those who understand the modern educational landscape from the inside.</p>
               </div>
-              <div className="p-8 bg-white rounded-3xl shadow-sm border border-brand-plum/5">
+              <div className="p-8 bg-white rounded-3xl shadow-sm ">
                 <Heart className="w-10 h-10 text-brand-pink mb-6" />
                 <h4 className="font-bold text-xl mb-3">Holistic Well-being</h4>
-                <p className="text-brand-charcoal/60 leading-relaxed text-sm">Centering compassion and mental health as fundamental pillars of academic success.</p>
+                <p className="text-brand-charcoal leading-relaxed text-sm">Centering compassion and mental health as fundamental pillars of academic success.</p>
               </div>
             </div>
           </div>
@@ -1149,17 +1161,17 @@ const About = () => (
           transition={{ duration: 0.8 }}
           className="relative"
         >
-          <div className="aspect-[4/5] bg-brand-pink-light/50 rounded-[3rem] flex flex-col justify-center items-center p-16 relative overflow-hidden border border-brand-plum/5">
-             <div className="absolute inset-0 border border-brand-plum/10 rounded-[3rem] rotate-3 -z-10" />
-             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-rose opacity-30 blur-3xl -mr-16 -mt-16" />
+          <div className="aspect-[4/5] bg-brand-blue/20 rounded-[3rem] flex flex-col justify-center items-center p-16 relative overflow-hidden ">
+             <div className="absolute inset-0  rounded-[3rem] rotate-3 -z-10" />
+             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue opacity-30 blur-3xl -mr-16 -mt-16" />
              <div className="text-center">
-                <blockquote className="text-3xl md:text-5xl font-display italic text-brand-plum mb-10 leading-tight tracking-tight px-4">
+                <blockquote className="text-3xl md:text-5xl font-display italic text-brand-charcoal mb-10 leading-tight tracking-tight px-4">
                   "Education shouldn't be a privilege of neuro-conformity. We build the scaffolds so every student can reach the top."
                 </blockquote>
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-12 h-px bg-brand-pink mb-2" />
-                  <p className="font-bold text-brand-plum tracking-[0.1em] uppercase text-sm">The Scaffold Team</p>
-                  <p className="text-xs text-brand-plum/30 font-bold uppercase tracking-widest">Global Leadership</p>
+                  <p id="team" className="font-bold text-brand-charcoal tracking-[0.1em] uppercase text-sm scroll-mt-24">The Scaffold Team</p>
+                  <p className="text-xs text-brand-charcoal font-bold uppercase tracking-widest">Global Leadership</p>
                 </div>
              </div>
           </div>
@@ -1169,67 +1181,42 @@ const About = () => (
   </section>
 );
 
-const GlobalReach = () => (
-  <section className="py-32 bg-brand-white">
-    <div className="max-w-7xl mx-auto px-6">
-      <div className="text-center mb-24">
-        <span className="text-[11px] font-bold tracking-[0.3em] uppercase text-brand-plum/40 mb-4 block">Proven Scalability</span>
-        <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter">30 Days of Global Impact</h2>
-        <p className="max-w-2xl mx-auto text-brand-charcoal/60 text-lg font-medium">From pilot concept to active operations across four countries in our first 30 days.</p>
-      </div>
-      
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
-        {[
-          { country: "India", status: "Operational Hub", regions: "Delhi NCR, Chandigarh, Jaipur" },
-          { country: "UAE", status: "Active Network", regions: "Pilot Phase Launched" },
-          { country: "Thailand", status: "Direct Reach", regions: "Community Partnerships" },
-          { country: "Spain", status: "Volunteer Hub", regions: "Advocacy & Support" }
-        ].map((item, idx) => (
-          <motion.div 
-            key={item.country}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: idx * 0.1 }}
-            className="p-10 glass-card rounded-[2.5rem] hover:bg-brand-pink-light/30 group border border-brand-plum/10"
-          >
-            <Globe className="w-12 h-12 mb-8 text-brand-plum group-hover:scale-110 transition-transform duration-500" />
-            <h3 className="text-2xl mb-2 font-display">{item.country}</h3>
-            <p className="text-[10px] font-black text-brand-pink mb-6 uppercase tracking-widest leading-none">{item.status}</p>
-            <p className="text-sm font-medium text-brand-charcoal/50 leading-relaxed">{item.regions}</p>
-          </motion.div>
-        ))}
+const Timeline = () => (
+  <section className="py-32 bg-brand-blue/10 relative overflow-hidden">
+    <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="text-center mb-20">
+        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">Proven Scalability</span>
+        <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter font-display text-brand-charcoal">The Timeline of Growth</h2>
+        <p className="max-w-2xl mx-auto text-brand-charcoal text-lg font-medium">From concept to active operations, driving neurodivergent inclusion regionally.</p>
       </div>
 
-      <div className="bg-brand-plum text-white p-12 md:p-20 rounded-[4rem] relative overflow-hidden shadow-2xl shadow-brand-plum/20">
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <Globe className="w-96 h-96" />
-        </div>
-        <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+      <div className="bg-brand-green/20 text-brand-charcoal p-12 md:p-20 rounded-[4rem] relative shadow-sm">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h3 className="text-4xl md:text-5xl mb-12 font-display text-brand-rose">The Timeline of Growth</h3>
+            <h3 className="text-4xl md:text-5xl mb-12 font-display text-brand-charcoal">Impact Mapping</h3>
             <div className="space-y-12">
               {[
                 { date: "Feb 1, 2026", task: "Initiative Launch & Global Identity Reveal" },
-                { date: "Feb 15, 2026", task: "Secured 15+ School Partnerships in India" },
-                { date: "Feb 28, 2026", task: "Volunteer Network Expanded to 4 Countries" },
+                { date: "Feb 15, 2026", task: "Secured 15+ School Partnerships" },
+                { date: "Feb 28, 2026", task: "Volunteer Network Expanded to 4 Hubs" },
                 { date: "March 2026", task: "Commenced 90-Day Impact Pipeline Planning" }
               ].map((m, i) => (
                 <div key={i} className="flex gap-6">
-                  <div className="w-px h-full bg-white/10 mt-2 relative">
+                  <div className="w-px h-full bg-brand-charcoal/10 mt-2 relative">
                     <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-brand-pink shadow-[0_0_10px_rgba(240,98,146,0.8)]" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-brand-rose uppercase tracking-[0.2em] mb-2">{m.date}</p>
-                    <p className="text-xl font-medium opacity-90 leading-tight">{m.task}</p>
+                    <h4 className="text-xs font-black tracking-[0.2em] uppercase text-brand-pink mb-2">{m.date}</h4>
+                    <p className="text-lg font-bold">{m.task}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="text-center lg:text-right hidden sm:block">
-            <p className="text-[12rem] md:text-[16rem] font-display text-brand-pink/10 leading-none -mb-8">30</p>
-            <p className="text-2xl md:text-3xl font-display text-white/40">Days to Global Operations</p>
+          <div className="relative">
+             <div className="aspect-square bg-brand-blue/20 rounded-full flex items-center justify-center opacity-70 border border-brand-blue/30 mx-auto max-w-sm">
+                <Globe className="w-1/2 h-1/2 text-brand-blue drop-shadow-md" />
+             </div>
           </div>
         </div>
       </div>
@@ -1238,19 +1225,19 @@ const GlobalReach = () => (
 );
 
 const Pipeline = () => (
-  <section className="py-32 bg-brand-cream relative overflow-hidden">
+  <section className="py-32 bg-brand-blue/10 relative overflow-hidden">
     <div className="max-w-7xl mx-auto px-6 relative z-10">
       <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-20">
         <div className="max-w-2xl">
           <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">Future Outlook</span>
-          <h2 className="text-5xl md:text-7xl mb-8 tracking-tighter font-display text-brand-plum">90-Day Impact Pipeline</h2>
-          <p className="text-brand-charcoal/60 leading-relaxed text-lg font-medium">
+          <h2 className="text-5xl md:text-7xl mb-8 tracking-tighter font-display text-brand-charcoal">90-Day Impact Pipeline</h2>
+          <p className="text-brand-charcoal leading-relaxed text-lg font-medium">
             Active scaling across North India, focused on high-engagement school environments and community diagnostic hubs.
           </p>
         </div>
         <div className="flex flex-col items-end">
-          <p className="text-7xl md:text-9xl font-display text-brand-plum leading-none tracking-tighter">2,000+</p>
-          <p className="text-[11px] font-bold text-brand-plum/40 uppercase tracking-[2px] mt-4">Projected Students Affected by July</p>
+          <p className="text-7xl md:text-9xl font-display text-brand-charcoal leading-none tracking-tighter">2,000+</p>
+          <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[2px] mt-4">Projected Students Affected by July</p>
         </div>
       </div>
       
@@ -1278,14 +1265,14 @@ const Pipeline = () => (
           <motion.div 
             key={idx}
             whileHover={{ y: -12 }}
-            className="bg-white p-12 rounded-[2rem] shadow-sm border border-brand-plum/5 group"
+            className="bg-white p-12 rounded-[2rem] shadow-sm  group"
           >
-            <div className="w-16 h-16 bg-brand-cream rounded-2xl flex items-center justify-center text-brand-pink mb-10 border border-brand-plum/5 group-hover:bg-brand-plum group-hover:text-white transition-all duration-500">
+            <div className="w-16 h-16 bg-brand-cream rounded-[2rem] flex items-center justify-center text-brand-pink mb-10  group-hover:bg-brand-pink group-hover:text-brand-charcoal transition-all duration-500">
               {item.icon}
             </div>
             <p className="text-brand-pink text-[12px] font-bold uppercase tracking-[1.5px] mb-4">{item.label}</p>
-            <h3 className="text-2xl mb-6 font-display leading-tight tracking-tight text-brand-plum">{item.title}</h3>
-            <p className="text-brand-charcoal/60 leading-relaxed text-sm font-medium">{item.description}</p>
+            <h3 className="text-2xl mb-6 font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
+            <p className="text-brand-charcoal leading-relaxed text-sm font-medium">{item.description}</p>
           </motion.div>
         ))}
       </div>
@@ -1304,12 +1291,12 @@ const SupportModel = () => {
   ];
 
   return (
-    <section id="model" className="py-32 bg-brand-white">
+    <section id="model" className="py-32 bg-brand-mint/10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-24">
           <span className="text-[11px] font-bold tracking-[2px] uppercase text-brand-pink mb-4 block">Operational Framework</span>
-          <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter font-display text-brand-plum">A Holistic Support Model</h2>
-          <p className="text-brand-charcoal/60 max-w-2xl mx-auto text-lg font-medium">Bridging the gap between initial diagnosis and long-term academic success.</p>
+          <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter font-display text-brand-charcoal">A Holistic Support Model</h2>
+          <p className="text-brand-charcoal max-w-2xl mx-auto text-lg font-medium">Bridging the gap between initial diagnosis and long-term academic success.</p>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1320,13 +1307,13 @@ const SupportModel = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
-              className="p-10 border border-brand-plum/5 rounded-3xl hover:bg-brand-cream transition-all cursor-default group"
+              className="p-10  rounded-3xl hover:bg-brand-cream transition-all cursor-default group"
             >
               <div className="flex gap-4 items-center mb-6">
-                <div className="w-1.5 h-8 bg-brand-pink rounded-full group-hover:bg-brand-plum transition-all" />
-                <h3 className="text-2xl font-display leading-tight tracking-tight text-brand-plum">{item.title}</h3>
+                <div className="w-1.5 h-8 bg-brand-pink rounded-full group-hover:bg-brand-pink transition-all" />
+                <h3 className="text-2xl font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
               </div>
-              <p className="text-sm text-brand-charcoal/60 leading-relaxed font-medium">{item.text}</p>
+              <p className="text-sm text-brand-charcoal leading-relaxed font-medium">{item.text}</p>
             </motion.div>
           ))}
         </div>
@@ -1335,47 +1322,47 @@ const SupportModel = () => {
   );
 };
 
-const WhyMatters = ({ onOpenModal }: { onOpenModal: () => void }) => (
-  <section className="py-32 bg-brand-plum text-brand-cream relative overflow-hidden border-t border-white/5">
+const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
+  <section className="py-32 bg-brand-blue text-brand-charcoal relative overflow-hidden border-t ">
     <div className="absolute inset-0 scaffold-grid opacity-5 pointer-events-none" />
     <div className="max-w-7xl mx-auto px-6 relative z-10">
       <div className="grid lg:grid-cols-2 gap-24 items-center">
         <div>
-          <span className="text-[11px] font-bold tracking-[3px] uppercase text-brand-rose mb-6 block">Systemic Advocacy</span>
+          <span className="text-[11px] font-bold tracking-[3px] uppercase text-brand-charcoal mb-6 block">Systemic Advocacy</span>
           <h2 className="text-5xl md:text-7xl mb-10 leading-[1.1] font-display tracking-tighter">Confronting the Diagnostic Cliff</h2>
-          <p className="text-xl text-brand-cream/70 mb-12 leading-relaxed font-medium">
+          <p className="text-xl text-brand-charcoal mb-12 leading-relaxed font-medium">
             In many underserved communities, "neurodivergence" is invisible. Stigma often replaces support.
           </p>
           <div className="space-y-10">
             <div className="flex gap-6">
-               <div className="w-14 h-14 rounded-2xl bg-white/5 flex-shrink-0 flex items-center justify-center border border-white/10 group hover:bg-brand-pink transition-all">
-                 <Zap className="w-7 h-7 text-brand-pink group-hover:text-brand-plum transition-colors" />
+               <div className="w-14 h-14 rounded-[2rem] bg-white/5 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
+                 <Zap className="w-7 h-7 text-brand-pink group-hover:text-brand-charcoal transition-colors" />
                </div>
                <div>
                  <h4 className="text-2xl mb-4 font-display tracking-tight">Invisible Barriers</h4>
-                 <p className="text-sm text-brand-cream/50 leading-relaxed font-medium">The lack of awareness often leads to neurodivergent students being labeled as "difficult" rather than supported, creating lifelong academic scars.</p>
+                 <p className="text-sm text-brand-charcoal leading-relaxed font-medium">The lack of awareness often leads to neurodivergent students being labeled as "difficult" rather than supported, creating lifelong academic scars.</p>
                </div>
             </div>
             <div className="flex gap-6">
-               <div className="w-14 h-14 rounded-2xl bg-white/5 flex-shrink-0 flex items-center justify-center border border-white/10 group hover:bg-brand-pink transition-all">
-                 <Sparkles className="w-7 h-7 text-brand-pink group-hover:text-brand-plum transition-colors" />
+               <div className="w-14 h-14 rounded-[2rem] bg-white/5 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
+                 <Sparkles className="w-7 h-7 text-brand-pink group-hover:text-brand-charcoal transition-colors" />
                </div>
                <div>
                  <h4 className="text-2xl mb-4 font-display tracking-tight">Structural Scaffolding</h4>
-                 <p className="text-sm text-brand-cream/50 leading-relaxed font-medium">We focus on Tier 2 & 3 regions where stigma is highest, providing the tools that bridge the gap between classroom and care.</p>
+                 <p className="text-sm text-brand-charcoal leading-relaxed font-medium">We focus on Tier 2 & 3 regions where stigma is highest, providing the tools that bridge the gap between classroom and care.</p>
                </div>
             </div>
           </div>
         </div>
-        <div className="bg-white/5 p-16 rounded-[3rem] border border-white/10 backdrop-blur-md relative">
+        <div className="bg-white/5 p-16 rounded-[3rem]   relative">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-pink opacity-10 blur-3xl" />
-          <h3 className="text-5xl font-display mb-10 text-brand-rose leading-tight tracking-tighter">The Scaffold is the bridge.</h3>
+          <h3 className="text-5xl font-display mb-10 text-brand-charcoal leading-tight tracking-tighter">The Scaffold is the bridge.</h3>
           <p className="text-lg opacity-60 leading-relaxed mb-12 font-medium italic">
             Advocacy without infrastructure is just talk. By building partnerships with schools and psychiatrists, we create a sustainable ecosystem of care for every neurodivergent mind.
           </p>
           <button 
-            onClick={onOpenModal}
-            className="w-full py-6 bg-brand-cream text-brand-plum rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-pink hover:text-white transition-all transform hover:scale-[1.02] cursor-pointer shadow-lg"
+            onClick={onViewPartner}
+            className="w-full py-6 bg-brand-cream text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-pink hover:text-brand-charcoal transition-all transform hover:scale-[1.02] cursor-pointer shadow-sm"
           >
             Support Our Mission
           </button>
@@ -1386,53 +1373,51 @@ const WhyMatters = ({ onOpenModal }: { onOpenModal: () => void }) => (
 );
 
 const Footer = () => (
-  <footer className="py-24 bg-brand-plum text-brand-cream border-t border-white/10">
+  <footer className="py-24 bg-brand-charcoal text-brand-cream border-t ">
     <div className="max-w-7xl mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
         <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-brand-cream rounded-xl flex items-center justify-center font-display font-black text-xl text-brand-plum">S</div>
+              <div className="w-10 h-10 bg-brand-cream rounded-[1.5rem] flex items-center justify-center font-display font-black text-xl text-brand-cream">S</div>
               <span className="font-display font-black text-2xl tracking-tight text-brand-cream uppercase">The Scaffold Initiative</span>
             </div>
-            <p className="text-brand-cream/60 max-w-sm mb-10 text-lg leading-relaxed font-medium">
+            <p className="text-brand-cream max-w-sm mb-10 text-lg leading-relaxed font-medium">
               A youth-led non-profit redefining academic and social inclusion for neurodivergent minds globally.
             </p>
             <div className="flex gap-6">
-              {['LinkedIn', 'Instagram', 'Twitter'].map(social => (
-                <a key={social} href="#" className="text-xs font-black tracking-widest uppercase text-brand-cream/40 hover:text-brand-rose transition-colors">
-                  {social}
+              <a href="https://www.instagram.com/the.scaffold.initiative?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="text-xs font-black tracking-widest uppercase text-brand-cream hover:text-brand-cream transition-colors">
+                  Instagram
                 </a>
-              ))}
             </div>
         </div>
         <div>
-          <h4 className="font-black mb-8 uppercase text-[10px] tracking-[0.3em] text-brand-rose">Engagement</h4>
-          <ul className="space-y-5 text-sm font-bold text-brand-cream/70 tracking-tight">
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Partner with us</a></li>
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Volunteer network</a></li>
-             <li><a href="#" className="hover:text-brand-rose transition-colors">School outreach</a></li>
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Emergency support</a></li>
+          <h4 className="font-black mb-8 uppercase text-[10px] tracking-[0.3em] text-brand-cream">Engagement</h4>
+          <ul className="space-y-5 text-sm font-bold text-brand-cream tracking-tight">
+             <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Partner with us</button></li>
+             <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Volunteer network</button></li>
+             <li><button onClick={() => (window as any).navigate('about')} className="hover:text-brand-cream transition-colors">School outreach</button></li>
+             <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Emergency support</button></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-black mb-8 uppercase text-[10px] tracking-[0.3em] text-brand-rose">Organization</h4>
-          <ul className="space-y-5 text-sm font-bold text-brand-cream/70 tracking-tight">
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Impact roadmap</a></li>
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Leadership</a></li>
-             <li><a href="#" className="hover:text-brand-rose transition-colors">Contact center</a></li>
+          <h4 className="font-black mb-8 uppercase text-[10px] tracking-[0.3em] text-brand-cream">Organization</h4>
+          <ul className="space-y-5 text-sm font-bold text-brand-cream tracking-tight">
+             <li><button onClick={() => (window as any).navigate('impact')} className="hover:text-brand-cream transition-colors">Impact roadmap</button></li>
+             <li><button onClick={() => (window as any).navigate('team')} className="hover:text-brand-cream transition-colors">Leadership</button></li>
+             <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Contact center</button></li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream/30">
+      <div className="border-t  pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream">
         <p>© 2026 THE SCAFFOLD INITIATIVE.</p>
-        <div className="flex gap-8 px-8 py-3 border border-white/10 rounded-full items-center">
+        <div className="flex gap-8 px-8 py-3  rounded-full items-center">
           <p>Global Advocacy</p>
           <div className="w-px h-3 bg-white/20" />
           <p>Youth-Led Project</p>
           <div className="w-px h-3 bg-white/20" />
           <button 
-            onClick={() => (window as any).toggleAdmin?.()} 
-            className="hover:text-brand-rose transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
+            onClick={() => (window as any).navigate('admin')} 
+            className="hover:text-brand-cream transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
           >
             Staff Login
           </button>
@@ -1442,12 +1427,12 @@ const Footer = () => (
   </footer>
 );
 
-const FinalCTA = ({ onOpenModal }: { onOpenModal: () => void }) => (
-  <section className="py-40 bg-brand-cream relative overflow-hidden text-center border-t border-brand-plum/5">
+const FinalCTA = ({ onViewPartner }: { onViewPartner: () => void }) => (
+  <section className="py-40 bg-brand-blue/20 relative overflow-hidden text-center border-t border-brand-blue/30">
      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-brand-pink opacity-[0.05] blur-3xl rounded-full" />
      <div className="max-w-5xl mx-auto px-6 relative z-10">
         <span className="text-[11px] font-bold tracking-[4px] uppercase text-brand-pink mb-8 block">Call to Action</span>
-        <h2 className="text-6xl md:text-9xl mb-16 font-display leading-none tracking-tighter leading-[0.85] text-brand-plum">Will you help us build the next scaffold?</h2>
+        <h2 className="text-6xl md:text-9xl mb-16 font-display leading-none tracking-tighter leading-[0.85] text-brand-charcoal">Will you help us build the next scaffold?</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             "Partner With Us",
@@ -1457,8 +1442,8 @@ const FinalCTA = ({ onOpenModal }: { onOpenModal: () => void }) => (
           ].map((text, i) => (
             <button 
               key={i} 
-              onClick={onOpenModal}
-              className="py-12 bg-white border border-brand-plum/5 rounded-3xl hover:shadow-2xl hover:shadow-brand-pink/10 transition-all font-display font-medium text-xl text-brand-charcoal cursor-pointer group"
+              onClick={onViewPartner}
+              className="py-12 bg-white  rounded-3xl hover:shadow-sm hover:shadow-brand-pink/10 transition-all font-display font-medium text-xl text-brand-charcoal cursor-pointer group"
             >
               <span className="group-hover:scale-110 block transition-transform">{text}</span>
             </button>
@@ -1468,60 +1453,530 @@ const FinalCTA = ({ onOpenModal }: { onOpenModal: () => void }) => (
   </section>
 );
 
+
+const TeamPage = () => (
+  <section className="min-h-[80vh] bg-brand-cream py-32 px-6 flex flex-col justify-center">
+    <div className="max-w-7xl mx-auto text-center">
+      <div className="text-center mb-16">
+        <div className="w-24 h-24 bg-brand-pink/20 text-brand-pink rounded-[2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
+          <Users className="w-12 h-12" />
+        </div>
+        <h1 className="text-5xl md:text-7xl font-display text-brand-charcoal mb-6 tracking-tighter">Meet The Team</h1>
+        <p className="text-lg text-brand-charcoal max-w-2xl mx-auto font-medium mb-12">
+          The core team details will be revealed shortly. Stay tuned!
+        </p>
+      </div>
+
+      <div className="mb-20 py-20 bg-brand-blue/5 rounded-[2.5rem] border border-brand-blue/10 max-w-2xl mx-auto shadow-sm">
+        <h2 className="text-3xl font-display text-brand-charcoal mb-4">Coming Soon</h2>
+        <p className="text-brand-charcoal/70 font-medium">We are putting together an incredible global team.</p>
+      </div>
+      
+      <div className="text-center">
+        <button 
+          onClick={() => (window as any).navigate('home')}
+          className="px-8 py-4 bg-brand-charcoal text-brand-cream rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all shadow-sm"
+        >
+          Return Home
+        </button>
+      </div>
+    </div>
+  </section>
+);
+
 // --- Main App ---
 
-export default function App() {
-  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
-  const [view, setView] = useState<"landing" | "admin">("landing");
 
-  // Handle /admin routing
+const PartnerPage = ({ onExit }: { onExit: () => void }) => {
+  const [partnerType, setPartnerType] = useState<"none" | "school" | "volunteer" | "donate" | "help">("none");
+
+  // Reusing the inquiry form logic but categorized
+  const [formData, setFormData] = useState({ name: "", org: "", email: "", whatsapp: "", phoneCode: "+91", message: "" });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
+    try {
+      const payload = {
+        name: formData.name,
+        org: formData.org || "",
+        email: formData.email,
+        whatsapp: (formData.whatsapp && formData.whatsapp.trim().length > 0) ? `${formData.phoneCode} ${formData.whatsapp}` : "",
+        message: formData.message,
+        type: partnerType,
+      };
+      
+      const response = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        let errMessage = "Unknown error";
+        try {
+          const errData = await response.json();
+          errMessage = errData.error || errMessage;
+        } catch (e) {}
+        throw new Error(errMessage);
+      }
+      
+      setStatus("success");
+      setTimeout(() => {
+        setPartnerType("none");
+        setStatus("idle");
+        setFormData({ name: "", org: "", email: "", whatsapp: "", phoneCode: "+91", message: "" });
+      }, 3000);
+    } catch (err: any) {
+      setStatus("error");
+      setErrorMessage(err.message || "Failed to send inquiry.");
+    }
+  };
+
+  const OptionCard = ({ icon, title, desc, type }: { icon: any, title: string, desc: string, type: any }) => (
+    <div 
+      onClick={() => setPartnerType(type)}
+      className="p-8 bg-white rounded-3xl cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-pink/10 transition-all border border-brand-charcoal/10"
+    >
+      <div className="w-16 h-16 bg-brand-pink/20 rounded-2xl flex items-center justify-center text-brand-pink mb-6">
+        {icon}
+      </div>
+      <h3 className="font-bold text-xl mb-2 text-brand-charcoal">{title}</h3>
+      <p className="text-sm text-brand-charcoal/70 leading-relaxed font-medium">{desc}</p>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-brand-mint/20 py-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <button 
+          onClick={onExit}
+          className="flex items-center gap-2 text-brand-charcoal/50 hover:text-brand-pink transition-colors font-bold text-sm mb-12 uppercase tracking-wide"
+        >
+          <ChevronRight className="w-4 h-4 rotate-180" /> Back to Home
+        </button>
+
+        {partnerType === "none" ? (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-4xl md:text-6xl font-display text-brand-charcoal mb-6 leading-tight tracking-tight">How would you like to partner with us?</h1>
+            <p className="text-lg text-brand-charcoal/80 mb-12 max-w-2xl font-medium leading-relaxed">
+              Whether you are an educational institution, a passionate advocate, or a philanthropist, your support helps us build the scaffolds every neurodivergent student needs.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <OptionCard icon={<School className="w-8 h-8"/>} title="Partner as a School" desc="Implement our frameworks and inclusive programs in your educational institution." type="school" />
+              <OptionCard icon={<Users className="w-8 h-8"/>} title="Join as a Volunteer" desc="Become part of our global core team or local on-ground task forces." type="volunteer" />
+              <OptionCard icon={<Heart className="w-8 h-8"/>} title="Donate to the Cause" desc="Contribute funds to expand our reach in Tier 2 and Tier 3 cities." type="donate" />
+              <OptionCard icon={<Sparkles className="w-8 h-8"/>} title="Help Us Build" desc="Offer technical, creative, or specialized advisory support." type="help" />
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <button 
+              onClick={() => setPartnerType("none")}
+              className="text-brand-pink font-bold text-sm mb-8 flex items-center gap-2 hover:underline"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" /> Choose another option
+            </button>
+            <div className="bg-white p-10 md:p-16 rounded-[3rem] shadow-sm border border-brand-charcoal/10">
+              <h2 className="text-3xl md:text-4xl font-display text-brand-charcoal mb-4 capitalize">
+                {partnerType === "school" ? "School Partnership" :
+                 partnerType === "volunteer" ? "Volunteer Application" :
+                 partnerType === "donate" ? "Make a Donation" : "Help Us Build"}
+              </h2>
+              <p className="text-brand-charcoal/70 mb-10 font-medium">Please fill out this quick form, and our leadership team will reach out to you shortly.</p>
+              
+              {status === "success" ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-brand-green text-brand-charcoal rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">Thank you!</h3>
+                  <p className="text-brand-charcoal/70">We have received your details. Expect to hear from us very soon.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {errorMessage && (
+                    <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold">
+                      {errorMessage}
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">Full Name</label>
+                      <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="Jane Doe" />
+                    </div>
+                    {partnerType === "school" && (
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">School / Organization</label>
+                        <input type="text" required value={formData.org} onChange={e => setFormData({...formData, org: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="Global Academy" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">Email Address</label>
+                      <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="jane@example.com" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">WhatsApp (Optional)</label>
+                      <div className="flex gap-2">
+    <input 
+    type="text"
+    list="country-codes"
+    className="w-[110px] px-4 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent appearance-none cursor-text text-center whitespace-nowrap"
+    value={formData.phoneCode || "+91"}
+    onChange={e => setFormData({...formData, phoneCode: e.target.value})}
+    placeholder="+code"
+  />
+  <datalist id="country-codes">
+    <option value="+93">Afghanistan</option>
+    <option value="+355">Albania</option>
+    <option value="+213">Algeria</option>
+    <option value="+1-684">American Samoa</option>
+    <option value="+376">Andorra</option>
+    <option value="+244">Angola</option>
+    <option value="+1-264">Anguilla</option>
+    <option value="+672">Antarctica</option>
+    <option value="+1-268">Antigua and Barbuda</option>
+    <option value="+54">Argentina</option>
+    <option value="+374">Armenia</option>
+    <option value="+297">Aruba</option>
+    <option value="+61">Australia</option>
+    <option value="+43">Austria</option>
+    <option value="+994">Azerbaijan</option>
+    <option value="+1-242">Bahamas</option>
+    <option value="+973">Bahrain</option>
+    <option value="+880">Bangladesh</option>
+    <option value="+1-246">Barbados</option>
+    <option value="+375">Belarus</option>
+    <option value="+32">Belgium</option>
+    <option value="+501">Belize</option>
+    <option value="+229">Benin</option>
+    <option value="+1-441">Bermuda</option>
+    <option value="+975">Bhutan</option>
+    <option value="+591">Bolivia</option>
+    <option value="+387">Bosnia and Herzegovina</option>
+    <option value="+267">Botswana</option>
+    <option value="+55">Brazil</option>
+    <option value="+246">British Indian Ocean Territory</option>
+    <option value="+1-284">British Virgin Islands</option>
+    <option value="+673">Brunei</option>
+    <option value="+359">Bulgaria</option>
+    <option value="+226">Burkina Faso</option>
+    <option value="+257">Burundi</option>
+    <option value="+855">Cambodia</option>
+    <option value="+237">Cameroon</option>
+    <option value="+1">Canada</option>
+    <option value="+238">Cape Verde</option>
+    <option value="+1-345">Cayman Islands</option>
+    <option value="+236">Central African Republic</option>
+    <option value="+235">Chad</option>
+    <option value="+56">Chile</option>
+    <option value="+86">China</option>
+    <option value="+61">Christmas Island</option>
+    <option value="+61">Cocos Islands</option>
+    <option value="+57">Colombia</option>
+    <option value="+269">Comoros</option>
+    <option value="+682">Cook Islands</option>
+    <option value="+506">Costa Rica</option>
+    <option value="+385">Croatia</option>
+    <option value="+53">Cuba</option>
+    <option value="+599">Curacao</option>
+    <option value="+357">Cyprus</option>
+    <option value="+420">Czech Republic</option>
+    <option value="+243">Democratic Republic of the Congo</option>
+    <option value="+45">Denmark</option>
+    <option value="+253">Djibouti</option>
+    <option value="+1-767">Dominica</option>
+    <option value="+1-809">Dominican Republic</option>
+    <option value="+670">East Timor</option>
+    <option value="+593">Ecuador</option>
+    <option value="+20">Egypt</option>
+    <option value="+503">El Salvador</option>
+    <option value="+240">Equatorial Guinea</option>
+    <option value="+291">Eritrea</option>
+    <option value="+372">Estonia</option>
+    <option value="+251">Ethiopia</option>
+    <option value="+500">Falkland Islands</option>
+    <option value="+298">Faroe Islands</option>
+    <option value="+679">Fiji</option>
+    <option value="+358">Finland</option>
+    <option value="+33">France</option>
+    <option value="+689">French Polynesia</option>
+    <option value="+241">Gabon</option>
+    <option value="+220">Gambia</option>
+    <option value="+995">Georgia</option>
+    <option value="+49">Germany</option>
+    <option value="+233">Ghana</option>
+    <option value="+350">Gibraltar</option>
+    <option value="+30">Greece</option>
+    <option value="+299">Greenland</option>
+    <option value="+1-473">Grenada</option>
+    <option value="+1-671">Guam</option>
+    <option value="+502">Guatemala</option>
+    <option value="+44">Guernsey</option>
+    <option value="+224">Guinea</option>
+    <option value="+245">Guinea-Bissau</option>
+    <option value="+592">Guyana</option>
+    <option value="+509">Haiti</option>
+    <option value="+504">Honduras</option>
+    <option value="+852">Hong Kong</option>
+    <option value="+36">Hungary</option>
+    <option value="+354">Iceland</option>
+    <option value="+91">India</option>
+    <option value="+62">Indonesia</option>
+    <option value="+98">Iran</option>
+    <option value="+964">Iraq</option>
+    <option value="+353">Ireland</option>
+    <option value="+44">Isle of Man</option>
+    <option value="+972">Israel</option>
+    <option value="+39">Italy</option>
+    <option value="+225">Ivory Coast</option>
+    <option value="+1-876">Jamaica</option>
+    <option value="+81">Japan</option>
+    <option value="+44">Jersey</option>
+    <option value="+962">Jordan</option>
+    <option value="+7">Kazakhstan</option>
+    <option value="+254">Kenya</option>
+    <option value="+686">Kiribati</option>
+    <option value="+383">Kosovo</option>
+    <option value="+965">Kuwait</option>
+    <option value="+996">Kyrgyzstan</option>
+    <option value="+856">Laos</option>
+    <option value="+371">Latvia</option>
+    <option value="+961">Lebanon</option>
+    <option value="+266">Lesotho</option>
+    <option value="+231">Liberia</option>
+    <option value="+218">Libya</option>
+    <option value="+423">Liechtenstein</option>
+    <option value="+370">Lithuania</option>
+    <option value="+352">Luxembourg</option>
+    <option value="+853">Macau</option>
+    <option value="+389">Macedonia</option>
+    <option value="+261">Madagascar</option>
+    <option value="+265">Malawi</option>
+    <option value="+60">Malaysia</option>
+    <option value="+960">Maldives</option>
+    <option value="+223">Mali</option>
+    <option value="+356">Malta</option>
+    <option value="+692">Marshall Islands</option>
+    <option value="+222">Mauritania</option>
+    <option value="+230">Mauritius</option>
+    <option value="+262">Mayotte</option>
+    <option value="+52">Mexico</option>
+    <option value="+691">Micronesia</option>
+    <option value="+373">Moldova</option>
+    <option value="+377">Monaco</option>
+    <option value="+976">Mongolia</option>
+    <option value="+382">Montenegro</option>
+    <option value="+1-664">Montserrat</option>
+    <option value="+212">Morocco</option>
+    <option value="+258">Mozambique</option>
+    <option value="+95">Myanmar</option>
+    <option value="+264">Namibia</option>
+    <option value="+674">Nauru</option>
+    <option value="+977">Nepal</option>
+    <option value="+31">Netherlands</option>
+    <option value="+599">Netherlands Antilles</option>
+    <option value="+687">New Caledonia</option>
+    <option value="+64">New Zealand</option>
+    <option value="+505">Nicaragua</option>
+    <option value="+227">Niger</option>
+    <option value="+234">Nigeria</option>
+    <option value="+683">Niue</option>
+    <option value="+850">North Korea</option>
+    <option value="+1-670">Northern Mariana Islands</option>
+    <option value="+47">Norway</option>
+    <option value="+968">Oman</option>
+    <option value="+92">Pakistan</option>
+    <option value="+680">Palau</option>
+    <option value="+970">Palestine</option>
+    <option value="+507">Panama</option>
+    <option value="+675">Papua New Guinea</option>
+    <option value="+595">Paraguay</option>
+    <option value="+51">Peru</option>
+    <option value="+63">Philippines</option>
+    <option value="+64">Pitcairn</option>
+    <option value="+48">Poland</option>
+    <option value="+351">Portugal</option>
+    <option value="+1-787">Puerto Rico</option>
+    <option value="+974">Qatar</option>
+    <option value="+242">Republic of the Congo</option>
+    <option value="+262">Reunion</option>
+    <option value="+40">Romania</option>
+    <option value="+7">Russia</option>
+    <option value="+250">Rwanda</option>
+    <option value="+590">Saint Barthelemy</option>
+    <option value="+290">Saint Helena</option>
+    <option value="+1-869">Saint Kitts and Nevis</option>
+    <option value="+1-758">Saint Lucia</option>
+    <option value="+590">Saint Martin</option>
+    <option value="+508">Saint Pierre and Miquelon</option>
+    <option value="+1-784">Saint Vincent and the Grenadines</option>
+    <option value="+685">Samoa</option>
+    <option value="+378">San Marino</option>
+    <option value="+239">Sao Tome and Principe</option>
+    <option value="+966">Saudi Arabia</option>
+    <option value="+221">Senegal</option>
+    <option value="+381">Serbia</option>
+    <option value="+248">Seychelles</option>
+    <option value="+232">Sierra Leone</option>
+    <option value="+65">Singapore</option>
+    <option value="+1-721">Sint Maarten</option>
+    <option value="+421">Slovakia</option>
+    <option value="+386">Slovenia</option>
+    <option value="+677">Solomon Islands</option>
+    <option value="+252">Somalia</option>
+    <option value="+27">South Africa</option>
+    <option value="+82">South Korea</option>
+    <option value="+211">South Sudan</option>
+    <option value="+34">Spain</option>
+    <option value="+94">Sri Lanka</option>
+    <option value="+249">Sudan</option>
+    <option value="+597">Suriname</option>
+    <option value="+47">Svalbard and Jan Mayen</option>
+    <option value="+268">Swaziland</option>
+    <option value="+46">Sweden</option>
+    <option value="+41">Switzerland</option>
+    <option value="+963">Syria</option>
+    <option value="+886">Taiwan</option>
+    <option value="+992">Tajikistan</option>
+    <option value="+255">Tanzania</option>
+    <option value="+66">Thailand</option>
+    <option value="+228">Togo</option>
+    <option value="+690">Tokelau</option>
+    <option value="+676">Tonga</option>
+    <option value="+1-868">Trinidad and Tobago</option>
+    <option value="+216">Tunisia</option>
+    <option value="+90">Turkey</option>
+    <option value="+993">Turkmenistan</option>
+    <option value="+1-649">Turks and Caicos Islands</option>
+    <option value="+688">Tuvalu</option>
+    <option value="+1-340">U.S. Virgin Islands</option>
+    <option value="+256">Uganda</option>
+    <option value="+380">Ukraine</option>
+    <option value="+971">United Arab Emirates</option>
+    <option value="+44">United Kingdom</option>
+    <option value="+1">United States</option>
+    <option value="+598">Uruguay</option>
+    <option value="+998">Uzbekistan</option>
+    <option value="+678">Vanuatu</option>
+    <option value="+379">Vatican</option>
+    <option value="+58">Venezuela</option>
+    <option value="+84">Vietnam</option>
+    <option value="+681">Wallis and Futuna</option>
+    <option value="+212">Western Sahara</option>
+    <option value="+967">Yemen</option>
+    <option value="+260">Zambia</option>
+    <option value="+263">Zimbabwe</option>
+  </datalist>
+  <input 
+    type="tel" 
+    value={formData.whatsapp} 
+    onChange={e => setFormData({...formData, whatsapp: e.target.value})} 
+    className="flex-1 px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" 
+    placeholder="1234567890" 
+  />
+</div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">
+                      {partnerType === "donate" ? "Message or Amount Intent" : "How can we collaborate?"}
+                    </label>
+                    <textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent resize-none h-32" placeholder="Tell us a bit more..."></textarea>
+                  </div>
+                  <button type="submit" disabled={status === "loading"} className="w-full py-5 bg-brand-pink text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-blue transition-all flex justify-center items-center gap-3">
+                    {status === "loading" ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-5 h-5" /> Send Details</>}
+                  </button>
+                </form>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+export default function App() {
+  const [view, setView] = useState("home");
+
   useEffect(() => {
     const checkPath = () => {
-      if (window.location.pathname === "/admin") {
-        setView("admin");
-      } else {
-        setView("landing");
-      }
+      const path = window.location.pathname.replace(/^\//, '') || 'home';
+      setView(path);
     };
 
     checkPath();
-    
-    // Listen for back/forward navigation
     window.addEventListener("popstate", checkPath);
     
-    // Global toggle helper
-    (window as any).toggleAdmin = () => {
-      const newView = window.location.pathname === "/admin" ? "/" : "/admin";
-      window.history.pushState({}, "", newView);
+    (window as any).navigate = (path: string) => {
+      window.history.pushState({}, "", path === 'home' ? '/' : `/${path}`);
       checkPath();
+      window.scrollTo(0, 0);
     };
 
     return () => window.removeEventListener("popstate", checkPath);
   }, []);
 
-  if (view === "admin") {
-    return <AdminPortal onExit={() => {
-      window.history.pushState({}, "", "/");
-      setView("landing");
-    }} />;
+  // Modals & Single Page Apps
+  if (view === "partner") {
+    return <PartnerPage onExit={() => (window as any).navigate('home')} />;
   }
 
+  if (view === "admin") {
+    return <AdminPortal onExit={() => (window as any).navigate('home')} />;
+  }
+
+  // Layout wrapper for site pages
   return (
-    <div className="bg-brand-white selection:bg-brand-rose selection:text-brand-plum font-sans">
-      <Navbar onOpenModal={() => setIsPartnerModalOpen(true)} />
-      <Hero onOpenModal={() => setIsPartnerModalOpen(true)} />
-      <About />
-      <GlobalReach />
-      <Pipeline />
-      <SupportModel />
-      <WhyMatters onOpenModal={() => setIsPartnerModalOpen(true)} />
-      <FinalCTA onOpenModal={() => setIsPartnerModalOpen(true)} />
+    <div className="bg-brand-white selection:bg-brand-blue selection:text-brand-charcoal font-sans min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-grow flex flex-col">
+        {view === "home" && (
+          <>
+            <Hero onViewPartner={() => (window as any).navigate('partner')} />
+            <About />
+            <Timeline />
+            <Pipeline />
+            <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
+          </>
+        )}
+        {view === "about" && (
+          <>
+            <div className="pt-20"> {/* Spacer for navbar */}
+              <About />
+              <Timeline />
+            </div>
+            <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
+          </>
+        )}
+        {view === "impact" && (
+          <>
+            <div className="pt-20">
+              <WhyMatters onViewPartner={() => (window as any).navigate('partner')} />
+              <Pipeline />
+            </div>
+          </>
+        )}
+        {view === "model" && (
+          <>
+            <div className="pt-20">
+              <SupportModel />
+            </div>
+            <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
+          </>
+        )}
+        {view === "team" && (
+          <TeamPage />
+        )}
+      </div>
       <Footer />
-      
-      <PartnerModal 
-        isOpen={isPartnerModalOpen} 
-        onClose={() => setIsPartnerModalOpen(false)} 
-      />
     </div>
   );
 }

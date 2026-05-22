@@ -19,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Read firebase config
-const firebaseConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "firebase-applet-config.json"), "utf8"));
+const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), "firebase-applet-config.json"), "utf8"));
 
 // Initialize Client SDK (used as a fallback)
 const clientApp = initializeClientApp(firebaseConfig);
@@ -108,11 +108,11 @@ async function startServer() {
 
   // API Route for inquiry submission
   app.post("/api/inquiries", async (req, res) => {
-    const { name, email, whatsapp, message, org } = req.body;
+    const { name, email, whatsapp, message, org, type } = req.body;
 
-    console.log(`Processing inquiry from ${name} (${email})`);
+    console.log(`Processing inquiry from ${name} (${email}) for type ${type}`);
 
-    if (!name || !email || !whatsapp || !message) {
+    if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -122,8 +122,9 @@ async function startServer() {
         name,
         org: org || "",
         email,
-        whatsapp,
+        whatsapp: whatsapp || "",
         message,
+        type: type || "Other",
         status: "new",
       };
 
@@ -160,23 +161,42 @@ async function startServer() {
         }
       }
 
-      // 3. Automated Admin Notifications (Only admin notifications, not submitter)
+      // 3. Automated Admin Notifications
       const resend = getResend();
       const twilioSms = getTwilio();
       const fromWhatsApp = process.env.TWILIO_WHATSAPP_FROM?.trim();
-      const adminEmail = process.env.ADMIN_EMAIL?.trim() || "ayaan.kriplani2213@gmail.com";
       const adminWhatsApp = process.env.ADMIN_WHATSAPP?.trim();
 
+      let staffEmails: string[] = [];
+      const adminEmailEnv = process.env.ADMIN_EMAIL?.trim();
+      if (adminEmailEnv) {
+        staffEmails.push(adminEmailEnv);
+      }
+      try {
+        const adminApp = getFirebaseAdmin();
+        const adminDb = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== "(default)"
+          ? getAdminFirestore(adminApp, firebaseConfig.firestoreDatabaseId)
+          : getAdminFirestore(adminApp);
+          
+        const staffSnapshot = await adminDb.collection("admins").get();
+        if (!staffSnapshot.empty) {
+           const emails = staffSnapshot.docs.map(doc => doc.id);
+           staffEmails = [...new Set([...staffEmails, ...emails])];
+        }
+      } catch(e) {
+         console.warn("Could not fetch staff emails for notification", e);
+      }
+
       // Admin Email
-      if (resend && adminEmail) {
+      if (resend && staffEmails.length > 0) {
         try {
           await resend.emails.send({
             from: "System <onboarding@resend.dev>",
-            to: adminEmail,
+            to: staffEmails,
             subject: `New Inquiry: ${name}`,
             html: `<p>New partner inquiry from <strong>${name}</strong>.</p><p>Email: ${email}</p><p>WhatsApp: ${whatsapp}</p><p>Message: ${message}</p>`
           });
-          console.log("Admin Email sent.");
+          console.log("Admin Email sent to:", staffEmails.join(", "));
         } catch (e: any) {
           console.error("Failed to send admin email:", e?.message || e);
         }

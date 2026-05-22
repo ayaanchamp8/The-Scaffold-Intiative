@@ -5,18 +5,20 @@
   --font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
 
-  --color-brand-pink-light: #fce4ec;
-  --color-brand-pink: #f06292;
-  --color-brand-rose: #f8bbd0;
-  --color-brand-cream: #fdf8f7;
+  --color-brand-pink: #F5AFC3;
+  --color-brand-green: #A8B987;
+  --color-brand-teal: #7FC7D3;
+  --color-brand-blue: #A2D5F2;
+  --color-brand-mint: #C8E6C9;
+  --color-brand-cream: #F7F7F4;
   --color-brand-white: #ffffff;
-  --color-brand-plum: #3e363f;
-  --color-brand-charcoal: #2d2a2e;
+  --color-brand-plum: #1E1E1E; /* Mapped to Charcoal for existing classes */
+  --color-brand-charcoal: #1E1E1E;
 }
 
 @layer base {
   body {
-    @apply bg-brand-cream text-brand-charcoal font-sans selection:bg-brand-rose selection:text-brand-charcoal;
+    @apply bg-brand-cream text-brand-charcoal font-sans selection:bg-brand-pink selection:text-brand-charcoal;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -25,14 +27,14 @@
 }
 
 .scaffold-grid {
-  background-image: radial-gradient(circle at 1px 1px, rgba(62, 54, 63, 0.08) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(30, 30, 30, 0.15) 1px, transparent 0);
   background-size: 32px 32px;
 }
 
 .glass-card {
-  @apply bg-white/60 backdrop-blur-xl border border-brand-plum/10 shadow-sm transition-all duration-300;
+  @apply bg-white border-2 border-brand-charcoal rounded-[2rem] shadow-none transition-all duration-300;
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-br from-brand-charcoal via-brand-plum to-brand-charcoal;
+  @apply text-brand-charcoal;
 }
