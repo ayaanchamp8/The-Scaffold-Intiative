@@ -1146,9 +1146,9 @@ const Navbar = () => (
         </button>
       </div>
       <div className="hidden md:flex items-center gap-6 text-brand-charcoal">
-        <button onClick={() => (window as any).navigate('about')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">About</button>
+        <button onClick={() => (window as any).navigate('about')} className="text-sm font-semibold hover:text-brand-blue transition-colors cursor-pointer">About</button>
         <button onClick={() => (window as any).navigate('impact')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Impact</button>
-        <button onClick={() => (window as any).navigate('team')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Core Team</button>
+        <button onClick={() => (window as any).navigate('team')} className="text-sm font-semibold hover:text-brand-green transition-colors cursor-pointer">Core Team</button>
         <a 
           href="https://www.instagram.com/the.scaffold.initiative?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
           target="_blank" 
@@ -1160,7 +1160,7 @@ const Navbar = () => (
 
         <button 
           onClick={() => (window as any).navigate('partner')}
-          className="px-6 py-2.5 bg-brand-pink text-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all hover:scale-105 cursor-pointer"
+          className="px-6 py-2.5 bg-brand-pink text-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all hover:scale-105 cursor-pointer shadow-sm"
         >
           Partner With Us
         </button>
@@ -1193,7 +1193,7 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
   }, []);
 
   return (
-    <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-gradient-to-tr from-brand-pink/30 via-brand-cream to-brand-blue/35">
+    <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-gradient-to-tr from-brand-green/25 via-brand-pink/15 to-brand-blue/30">
       {/* Decorative Elements */}
       <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-25 blur-3xl rounded-full animate-pulse duration-[8000ms]" />
       <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-35 blur-3xl rounded-full animate-pulse duration-[6000ms]" />
@@ -1207,7 +1207,7 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
+              <span className="inline-block px-4 py-1.5 bg-brand-pink text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
                 EST. FEB 2026
               </span>
               <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
@@ -1223,14 +1223,14 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
                 </button>
                 <button 
                   onClick={() => (window as any).navigate('partner')}
-                  className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
+                  className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-green hover:text-brand-charcoal transition-all cursor-pointer"
                 >
                   Partner With Us
                 </button>
               </div>
             </motion.div>
           </div>
-
+ 
           {/* Brand Illustrated Logo Showcase */}
           <div className="lg:col-span-5 flex justify-center items-center">
             <motion.div
@@ -1238,7 +1238,7 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
               whileHover={{ scale: 1.05, rotate: 2 }}
-              className="p-8 md:p-12 bg-white/45 backdrop-blur-md rounded-[4rem] border-2 border-brand-pink/30 hover:border-brand-pink/60 transition-all duration-300 shadow-xl shadow-brand-charcoal/5 flex justify-center items-center cursor-pointer"
+              className="p-8 md:p-12 bg-white/45 backdrop-blur-md rounded-[4rem] border-2 border-brand-pink/30 hover:border-brand-blue/60 transition-all duration-300 shadow-xl shadow-brand-charcoal/5 flex justify-center items-center cursor-pointer"
             >
               <ScaffoldLogo size={320} className="w-64 h-64 md:w-80 md:h-80 drop-shadow-xl" />
             </motion.div>
@@ -1255,13 +1255,13 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
           className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-brand-charcoal/10 py-12"
         >
           {[
-            { label: "Countries Active", value: `${countries}` },
-            { label: "Vetted Volunteers", value: `${volunteers}+` },
-            { label: "Passive Reach", value: `${reach.toLocaleString()}+` },
-            { label: "School Partnerships", value: `${partners}+` }
+            { label: "Countries Active", value: `${countries}`, colorClass: "text-brand-blue" },
+            { label: "Vetted Volunteers", value: `${volunteers}+`, colorClass: "text-brand-pink" },
+            { label: "Passive Reach", value: `${reach.toLocaleString()}+`, colorClass: "text-brand-green" },
+            { label: "School Partnerships", value: `${partners}+`, colorClass: "text-brand-blue" }
           ].map((stat, i) => (
             <div key={i} className="hover:scale-105 transition-transform duration-300">
-              <p className="text-4xl md:text-5xl font-display font-bold text-brand-pink mb-2">{stat.value}</p>
+              <p className={`text-4xl md:text-5xl font-display font-bold mb-2 ${stat.colorClass}`}>{stat.value}</p>
               <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[1px]">{stat.label}</p>
             </div>
           ))}
@@ -1283,7 +1283,7 @@ const About = () => (
         >
           <div className="relative">
             <div className="absolute -top-10 -left-10 w-64 h-64 bg-brand-blue rounded-full opacity-20 blur-2xl" />
-            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">The Mission</span>
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-green mb-4 block">The Mission</span>
             <h2 className="text-4xl md:text-6xl mb-10 relative z-10 leading-tight tracking-tighter">Empowering students through academic and social inclusion.</h2>
             <p className="text-lg text-brand-charcoal mb-8 leading-relaxed font-medium">
               Launched in February 2026, The Scaffold Initiative is a youth-led organization born from a critical observation: the "diagnostic cliff" between receiving a diagnosis and receiving actual support.
@@ -1293,12 +1293,12 @@ const About = () => (
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="p-8 bg-brand-blue/20 rounded-3xl shadow-sm ">
-                <Users className="w-10 h-10 text-brand-pink mb-6" />
+                <Users className="w-10 h-10 text-brand-blue mb-6" />
                 <h4 className="font-bold text-xl mb-3">Youth-Led Advocacy</h4>
                 <p className="text-brand-charcoal leading-relaxed text-sm">Built and driven by those who understand the modern educational landscape from the inside.</p>
               </div>
-              <div className="p-8 bg-brand-pink/20 rounded-3xl shadow-sm ">
-                <Heart className="w-10 h-10 text-brand-pink mb-6" />
+              <div className="p-8 bg-brand-green/20 rounded-3xl shadow-sm ">
+                <Heart className="w-10 h-10 text-brand-green mb-6" />
                 <h4 className="font-bold text-xl mb-3">Holistic Well-being</h4>
                 <p className="text-brand-charcoal leading-relaxed text-sm">Centering compassion and mental health as fundamental pillars of academic success.</p>
               </div>
@@ -1321,7 +1321,7 @@ const About = () => (
                   "Education shouldn't be a privilege of neuro-conformity. We build the scaffolds so every student can reach the top."
                 </blockquote>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-px bg-brand-pink mb-2" />
+                  <div className="w-12 h-px bg-brand-green/60 mb-2" />
                   <p id="team" className="font-bold text-brand-charcoal tracking-[0.1em] uppercase text-sm scroll-mt-24">The Scaffold Team</p>
                   <p className="text-xs text-brand-charcoal font-bold uppercase tracking-widest">Global Leadership</p>
                 </div>
@@ -2066,12 +2066,12 @@ const InclusionSandbox = () => {
 
 
 const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="py-32 bg-gradient-to-br from-brand-blue/30 via-brand-cream to-brand-green/25 text-brand-charcoal relative overflow-hidden border-t border-brand-pink/20">
+  <section className="py-32 bg-gradient-to-br from-brand-blue/20 via-brand-cream to-brand-pink/20 text-brand-charcoal relative overflow-hidden border-t border-brand-pink/30">
     <div className="absolute inset-0 scaffold-grid opacity-5 pointer-events-none" />
     <div className="max-w-7xl mx-auto px-6 relative z-10">
       <div className="grid lg:grid-cols-2 gap-24 items-center">
         <div>
-          <span className="text-[11px] font-bold tracking-[3px] uppercase text-brand-charcoal mb-6 block">Systemic Advocacy</span>
+          <span className="text-[11px] font-bold tracking-[3px] uppercase text-brand-pink mb-6 block">Systemic Advocacy</span>
           <h2 className="text-5xl md:text-7xl mb-10 leading-[1.1] font-display tracking-tighter">Confronting the Diagnostic Cliff</h2>
           <p className="text-xl text-brand-charcoal mb-12 leading-relaxed font-medium">
             In many underserved communities, "neurodivergence" is invisible. Stigma often replaces support.
@@ -2087,8 +2087,8 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
                </div>
             </div>
             <div className="flex gap-6">
-               <div className="w-14 h-14 rounded-[2rem] bg-brand-cream/10 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
-                 <Sparkles className="w-7 h-7 text-brand-pink group-hover:text-brand-charcoal transition-colors" />
+               <div className="w-14 h-14 rounded-[2rem] bg-brand-cream/10 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-green transition-all">
+                 <Sparkles className="w-7 h-7 text-brand-green group-hover:text-brand-charcoal transition-colors" />
                </div>
                <div>
                  <h4 className="text-2xl mb-4 font-display tracking-tight">Structural Scaffolding</h4>
@@ -2157,7 +2157,7 @@ const Footer = () => (
           <p>Global Advocacy</p>
           <div className="w-px h-3 bg-brand-blue/30" />
           <p>Youth-Led Project</p>
-          <div className="w-px h-3 bg-brand-pink/30" />
+          <div className="w-px h-3 bg-brand-green/30" />
           <button 
             onClick={() => (window as any).navigate('admin')} 
             className="hover:text-brand-cream transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
@@ -2171,8 +2171,8 @@ const Footer = () => (
 );
 
 const FinalCTA = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="py-40 bg-brand-pink/15 relative overflow-hidden text-center border-t border-brand-pink/25">
-     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-brand-pink opacity-[0.05] blur-3xl rounded-full" />
+  <section className="py-40 bg-gradient-to-br from-brand-blue/15 via-brand-cream/50 to-brand-pink/15 relative overflow-hidden text-center border-t border-brand-pink/20">
+     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-brand-pink opacity-[0.03] blur-3xl rounded-full" />
      <div className="max-w-5xl mx-auto px-6 relative z-10">
         <span className="text-[11px] font-bold tracking-[4px] uppercase text-brand-pink mb-8 block">Call to Action</span>
         <h2 className="text-6xl md:text-9xl mb-16 font-display leading-none tracking-tighter leading-[0.85] text-brand-charcoal">Will you help us build the next scaffold?</h2>
@@ -2203,7 +2203,7 @@ const TeamPage = () => (
   <section className="min-h-[80vh] bg-brand-cream py-32 px-6 flex flex-col justify-center">
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <div className="w-24 h-24 bg-brand-pink/20 text-brand-pink rounded-[2.2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
+        <div className="w-24 h-24 bg-brand-green/20 text-brand-green rounded-[2.2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
           <Users className="w-12 h-12" />
         </div>
         <h1 className="text-5xl md:text-7xl font-display text-brand-charcoal mb-6 tracking-tighter">Meet The Team</h1>
@@ -2223,11 +2223,11 @@ const TeamPage = () => (
           <div className="mt-8 text-xs font-black uppercase text-brand-blue tracking-[2px] opacity-65">Revealing Soon</div>
         </div>
 
-        <div className="bg-brand-pink/20 border-2 border-brand-pink/35 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <div className="bg-brand-pink/15 border-2 border-brand-pink/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
           <div className="w-16 h-16 bg-brand-pink text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Users className="w-8 h-8" />
           </div>
-          <span className="px-4 py-1.5 bg-brand-pink/25 text-brand-pink border border-brand-pink/40 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Youth Leadership</span>
+          <span className="px-4 py-1.5 bg-brand-pink/20 text-brand-pink border border-brand-pink/35 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Youth Leadership</span>
           <h3 className="text-2xl font-display text-brand-charcoal mb-4">Global Facilitators</h3>
           <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Driving outreach in India, Spain, UAE, Thailand, and Singapore with structured regional leadership.</p>
           <div className="mt-8 text-xs font-black uppercase text-brand-pink tracking-[2px] opacity-75">Revealing Soon</div>
@@ -2311,9 +2311,9 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
   const OptionCard = ({ icon, title, desc, type }: { icon: any, title: string, desc: string, type: any }) => (
     <div 
       onClick={() => setPartnerType(type)}
-      className="p-8 bg-brand-blue/20 rounded-3xl cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-pink/10 transition-all border border-brand-charcoal/10"
+      className="p-8 bg-brand-blue/20 rounded-3xl cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-blue/10 transition-all border border-brand-charcoal/10"
     >
-      <div className="w-16 h-16 bg-brand-pink/20 rounded-2xl flex items-center justify-center text-brand-pink mb-6">
+      <div className="w-16 h-16 bg-brand-blue/20 rounded-2xl flex items-center justify-center text-brand-blue mb-6">
         {icon}
       </div>
       <h3 className="font-bold text-xl mb-2 text-brand-charcoal">{title}</h3>
@@ -2326,7 +2326,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
       <div className="max-w-4xl mx-auto">
         <button 
           onClick={onExit}
-          className="flex items-center gap-2 text-brand-charcoal/50 hover:text-brand-pink transition-colors font-bold text-sm mb-12 uppercase tracking-wide"
+          className="flex items-center gap-2 text-brand-charcoal/50 hover:text-brand-green transition-colors font-bold text-sm mb-12 uppercase tracking-wide"
         >
           <ChevronRight className="w-4 h-4 rotate-180" /> Back to Home
         </button>
@@ -2348,11 +2348,11 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <button 
               onClick={() => setPartnerType("none")}
-              className="text-brand-pink font-bold text-sm mb-8 flex items-center gap-2 hover:underline"
+              className="text-brand-green font-bold text-sm mb-8 flex items-center gap-2 hover:underline"
             >
               <ChevronRight className="w-4 h-4 rotate-180" /> Choose another option
             </button>
-            <div className="bg-brand-pink/20 p-10 md:p-16 rounded-[3rem] shadow-sm border border-brand-charcoal/10">
+            <div className="bg-brand-green/20 p-10 md:p-16 rounded-[3rem] shadow-sm border border-brand-charcoal/10">
               <h2 className="text-3xl md:text-4xl font-display text-brand-charcoal mb-4 capitalize">
                 {partnerType === "school" ? "School Partnership" :
                  partnerType === "volunteer" ? "Volunteer Application" :
@@ -2378,19 +2378,19 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">Full Name</label>
-                      <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="Jane Doe" />
+                      <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-green/40 transition-all font-medium border border-transparent" placeholder="Jane Doe" />
                     </div>
                     {partnerType === "school" && (
                       <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">School / Organization</label>
-                        <input type="text" required value={formData.org} onChange={e => setFormData({...formData, org: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="Global Academy" />
+                        <input type="text" required value={formData.org} onChange={e => setFormData({...formData, org: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-green/40 transition-all font-medium border border-transparent" placeholder="Global Academy" />
                       </div>
                     )}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">Email Address</label>
-                      <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="jane@example.com" />
+                      <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-green/40 transition-all font-medium border border-transparent" placeholder="jane@example.com" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">WhatsApp</label>
@@ -2398,7 +2398,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
     <input 
     type="text"
     list="country-codes"
-    className="w-[110px] px-4 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent appearance-none cursor-text text-center whitespace-nowrap"
+    className="w-[110px] px-4 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-green/40 transition-all font-medium border border-transparent appearance-none cursor-text text-center whitespace-nowrap"
     value={formData.phoneCode || "+91"}
     onChange={e => setFormData({...formData, phoneCode: e.target.value})}
     placeholder="+code"
@@ -2650,7 +2650,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
     required
     value={formData.whatsapp} 
     onChange={e => setFormData({...formData, whatsapp: e.target.value})} 
-    className="flex-1 px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" 
+    className="flex-1 px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-blue/40 transition-all font-medium border border-transparent" 
     placeholder="1234567890" 
   />
 </div>
@@ -2660,9 +2660,9 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
                     <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">
                       {partnerType === "donate" ? "Message or Amount Intent" : "How can we collaborate?"}
                     </label>
-                    <textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent resize-none h-32" placeholder="Tell us a bit more..."></textarea>
+                    <textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-blue/40 transition-all font-medium border border-transparent resize-none h-32" placeholder="Tell us a bit more..."></textarea>
                   </div>
-                  <button type="submit" disabled={status === "loading"} className="w-full py-5 bg-brand-pink text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-blue transition-all flex justify-center items-center gap-3">
+                  <button type="submit" disabled={status === "loading"} className="w-full py-5 bg-brand-blue text-brand-charcoal rounded-full font-bold uppercase tracking-widest text-sm hover:bg-brand-green transition-all flex justify-center items-center gap-3">
                     {status === "loading" ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-5 h-5" /> Send Details</>}
                   </button>
                 </form>
@@ -2708,7 +2708,7 @@ export default function App() {
 
   // Layout wrapper for site pages
   return (
-    <div className="bg-brand-cream selection:bg-brand-pink selection:text-brand-charcoal font-sans min-h-screen flex flex-col">
+    <div className="bg-brand-cream selection:bg-brand-blue/30 selection:text-brand-charcoal font-sans min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-grow flex flex-col">
         {view === "home" && (
