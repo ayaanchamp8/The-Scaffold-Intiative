@@ -33,7 +33,10 @@ import {
   Download,
   MessageCircle,
   LogIn,
-  Instagram
+  Instagram,
+  Play,
+  Pause,
+  RotateCcw
 } from "lucide-react";
 import { 
   db, 
@@ -99,6 +102,118 @@ const handleFirestoreError = (error: unknown, operationType: OperationType, path
 };
 
 // --- Components ---
+
+const ScaffoldLogo = ({ className = "w-10 h-10", size = 48 }: { className?: string; size?: number }) => (
+  <svg 
+    viewBox="0 0 320 320" 
+    width={size} 
+    height={size} 
+    className={className}
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* LEFT SIDE: PINK BRAIN */}
+    <path 
+      d="M130,50 C110,50 95,60 90,70 C80,68 65,75 60,95 C55,100 45,115 48,135 C42,145 40,160 45,175 C42,185 45,200 55,215 C52,225 58,245 75,255 C78,265 92,275 110,270 C118,272 130,265 135,255 C140,256 145,255 148,250 C150,250 152,230 152,160 M130,50 C140,100 148,125 152,160"
+      fill="#F8AFCB"
+      stroke="#2D141C"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    
+    {/* Internal sulci / fold lines of the brain */}
+    <path d="M135,255 C120,250 115,235 125,225 C135,215 140,225 148,215" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M110,270 C95,260 95,240 105,230 C115,220 120,230 130,220" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M75,255 C65,240 70,220 85,215 C100,210 110,220 120,205" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M55,215 C45,200 55,180 70,180 C85,180 95,190 110,180" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M45,175 C35,160 45,140 60,140 C75,140 85,155 100,150" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M48,135 C42,115 55,100 70,110 C85,120 90,130 105,120" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M60,95 C60,80 75,70 90,80 C105,90 105,105 115,100" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M90,70 C95,55 110,50 125,60 C135,68 135,85 142,85" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M130,95 C120,110 100,110 95,125" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M138,130 C125,140 110,135 105,155" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M142,165 C130,170 120,165 115,185" stroke="#2D141C" strokeWidth="3" fill="none" strokeLinecap="round" />
+    
+    {/* MIDDLE VERTICAL DIVIDER: "SCAFFOLD" Stacked Letter Blocks */}
+    <g transform="translate(155, 45)">
+      {/* Block 1: S (Teal) */}
+      <rect x="0" y="0" width="28" height="28" rx="5" fill="#68BAC6" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="20" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">S</text>
+      
+      {/* Block 2: C (Sage Green) */}
+      <rect x="0" y="31" width="28" height="28" rx="5" fill="#97BA9B" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="51" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">C</text>
+      
+      {/* Block 3: A (Pink) */}
+      <rect x="0" y="62" width="28" height="28" rx="5" fill="#F8AFCB" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="82" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">A</text>
+      
+      {/* Block 4: F (Teal) */}
+      <rect x="0" y="93" width="28" height="28" rx="5" fill="#68BAC6" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="113" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">F</text>
+      
+      {/* Block 5: F (Cream/Beige-White) */}
+      <rect x="0" y="124" width="28" height="28" rx="5" fill="#FFF1F4" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="144" fill="#2D141C" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">F</text>
+      
+      {/* Block 6: O (Pink) */}
+      <rect x="0" y="155" width="28" height="28" rx="5" fill="#F8AFCB" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="175" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">O</text>
+      
+      {/* Block 7: L (Teal) */}
+      <rect x="0" y="186" width="28" height="28" rx="5" fill="#68BAC6" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="206" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">L</text>
+      
+      {/* Block 8: D (Sage Green) */}
+      <rect x="0" y="217" width="28" height="28" rx="5" fill="#97BA9B" stroke="#2D141C" strokeWidth="3" />
+      <text x="14" y="237" fill="white" fontSize="16" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">D</text>
+    </g>
+    
+    {/* RIGHT SIDE: SCAFFOLD AND BUILDER */}
+    <g stroke="#2D141C" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="190" y1="45" x2="190" y2="290" />
+      <line x1="230" y1="120" x2="230" y2="290" />
+      <line x1="270" y1="120" x2="270" y2="290" />
+      
+      <line x1="190" y1="145" x2="270" y2="145" strokeWidth="2.5" />
+      <line x1="190" y1="185" x2="270" y2="185" strokeWidth="2.5" />
+      <line x1="190" y1="225" x2="270" y2="225" strokeWidth="2.5" />
+      <line x1="190" y1="265" x2="270" y2="265" strokeWidth="2.5" />
+      
+      <line x1="220" y1="120" x2="280" y2="120" strokeWidth="4" />
+      
+      <line x1="190" y1="145" x2="230" y2="185" opacity="0.8" />
+      <line x1="230" y1="145" x2="190" y2="185" opacity="0.8" />
+      <line x1="230" y1="145" x2="270" y2="185" opacity="0.8" />
+      <line x1="270" y1="145" x2="230" y2="185" opacity="0.8" />
+      
+      <line x1="190" y1="185" x2="230" y2="225" opacity="0.8" />
+      <line x1="230" y1="185" x2="190" y2="225" opacity="0.8" />
+      <line x1="230" y1="185" x2="270" y2="225" opacity="0.8" />
+      <line x1="270" y1="185" x2="230" y2="225" opacity="0.8" />
+
+      <line x1="190" y1="225" x2="230" y2="265" opacity="0.8" />
+      <line x1="230" y1="225" x2="190" y2="265" opacity="0.8" />
+      <line x1="230" y1="225" x2="270" y2="265" opacity="0.8" />
+      <line x1="270" y1="225" x2="230" y2="265" opacity="0.8" />
+      
+      <rect x="220" y="55" width="20" height="15" rx="2" fill="#2D141C" />
+      <rect x="195" y="55" width="15" height="15" rx="2" fill="#2D141C" />
+      <rect x="235" y="80" width="25" height="15" rx="2" fill="#2D141C" />
+      <rect x="210" y="90" width="15" height="15" rx="2" fill="#2D141C" />
+      
+      {/* Human/Builder */}
+      <circle cx="250" cy="72" r="7" fill="#2D141C" stroke="none" />
+      <line x1="250" y1="79" x2="250" y2="105" strokeWidth="5.5" />
+      <line x1="250" y1="85" x2="232" y2="80" strokeWidth="3" />
+      <line x1="250" y1="85" x2="235" y2="76" strokeWidth="2.5" />
+      <line x1="232" y1="65" x2="232" y2="118" strokeWidth="2" stroke="#2D141C" />
+      <line x1="245" y1="105" x2="242" y2="120" strokeWidth="4" />
+      <line x1="255" y1="105" x2="258" y2="120" strokeWidth="4" />
+    </g>
+  </svg>
+);
 
 // --- Admin Portal ---
 
@@ -388,7 +503,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md bg-white p-12 rounded-[3.5rem] shadow-sm text-center  relative overflow-hidden"
+          className="w-full max-w-md bg-brand-blue/20 p-12 rounded-[3.5rem] shadow-sm text-center  relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 w-full h-2 bg-brand-pink" />
           
@@ -454,7 +569,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               <div className="w-full border-t "></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-4 bg-white text-brand-charcoal font-bold uppercase tracking-widest">or</span>
+              <span className="px-4 bg-brand-pink/20 text-brand-charcoal font-bold uppercase tracking-widest">or</span>
             </div>
           </div>
 
@@ -462,7 +577,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             type="button"
             disabled={isSigningIn}
             onClick={handleGoogleSignIn}
-            className="w-full py-5 bg-white border-2  text-brand-charcoal rounded-[2rem] font-bold text-sm flex items-center justify-center gap-4 hover:bg-brand-cream hover: transition-all shadow-sm cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-brand-green/20 border-2  text-brand-charcoal rounded-[2rem] font-bold text-sm flex items-center justify-center gap-4 hover:bg-brand-cream hover: transition-all shadow-sm cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSigningIn ? (
               <Loader2 className="w-5 h-5 animate-spin text-brand-charcoal" />
@@ -507,7 +622,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg bg-white p-12 md:p-16 rounded-[4rem] shadow-sm text-center "
+          className="w-full max-w-lg bg-brand-blue/20 p-12 md:p-16 rounded-[4rem] shadow-sm text-center "
         >
           <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-10 border border-red-100">
             <ShieldCheck className="w-10 h-10" />
@@ -546,13 +661,13 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcf9f8] text-brand-charcoal font-sans flex flex-col md:flex-row">
+    <div className="min-h-screen bg-brand-cream text-brand-charcoal font-sans flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="w-full md:w-80 bg-brand-blue/20 text-brand-charcoal p-8 md:min-h-screen flex flex-col border-r ">
-        <div className="flex items-center gap-3 mb-16">
-          <div className="w-10 h-10 bg-brand-cream rounded-[1.5rem] flex items-center justify-center font-display font-black text-xl text-brand-charcoal">S</div>
+      <div className="w-full md:w-80 bg-brand-pink/15 text-brand-charcoal p-8 md:min-h-screen flex flex-col border-r border-brand-pink/20">
+        <div className="flex items-center gap-3 mb-16 animate-pulse-slow">
+          <ScaffoldLogo className="w-12 h-12" />
           <div>
-            <h1 className="font-display font-black text-lg tracking-tight uppercase leading-none">Scaffold</h1>
+            <h1 className="font-display font-black text-lg tracking-tight uppercase leading-none text-brand-charcoal">Scaffold</h1>
             <p className="text-[10px] font-black opacity-40 uppercase tracking-widest mt-1">Admin Panel</p>
           </div>
         </div>
@@ -571,7 +686,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               <button
                 key={item.id}
                 onClick={() => { setActiveTab("inquiries"); setFilter(item.id); }}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "inquiries" && filter === item.id ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "inquiries" && filter === item.id ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-brand-cream/10 opacity-60 hover:opacity-100'}`}
               >
                 {item.icon} {item.label}
               </button>
@@ -583,7 +698,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               <p className="text-[10px] font-black opacity-30 uppercase tracking-[2px] px-6 mb-2 mt-8">Administration</p>
               <button
                 onClick={() => setActiveTab("staff")}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "staff" ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-white/5 opacity-60 hover:opacity-100'}`}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all ${activeTab === "staff" ? 'bg-brand-pink text-brand-charcoal' : 'hover:bg-brand-cream/10 opacity-60 hover:opacity-100'}`}
               >
                 <Users className="w-4 h-4" /> Staff Management
               </button>
@@ -602,19 +717,19 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
           <div className="space-y-2">
             <button 
               onClick={() => setShowRoleInfo(true)}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-brand-cream/10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-brand-cream/20 transition-all cursor-pointer"
             >
               <Info className="w-4 h-4" /> Role Permissions
             </button>
             <button 
               onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-brand-cream/10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer"
             >
               <LogOut className="w-4 h-4" /> Logout
             </button>
             <button 
               onClick={onExit}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-brand-pink transition-all text-brand-charcoal cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-brand-cream/10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-brand-pink transition-all text-brand-charcoal cursor-pointer"
             >
               Exit Admin
             </button>
@@ -630,7 +745,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-2xl bg-white rounded-[3rem] shadow-sm relative overflow-hidden flex flex-col max-h-[80vh]"
+              className="w-full max-w-2xl bg-brand-pink/20 rounded-[3rem] shadow-sm relative overflow-hidden flex flex-col max-h-[80vh]"
             >
               <div className="p-10 border-b ">
                 <div className="flex items-center justify-between gap-4">
@@ -730,26 +845,26 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
             </header>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <div className="bg-white p-6 rounded-3xl shadow-sm">
+              <div className="bg-brand-green/20 p-6 rounded-3xl shadow-sm">
                  <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Total Inquiries</p>
                  <p className="text-4xl font-display text-brand-charcoal">{inquiries.length}</p>
               </div>
-              <div className="bg-white p-6 rounded-3xl shadow-sm">
+              <div className="bg-brand-blue/20 p-6 rounded-3xl shadow-sm">
                  <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">New</p>
                  <p className="text-4xl font-display text-brand-pink">{inquiries.filter(i => i.status === 'new').length}</p>
               </div>
-              <div className="bg-white p-6 rounded-3xl shadow-sm">
+              <div className="bg-brand-pink/20 p-6 rounded-3xl shadow-sm">
                  <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Contacted</p>
                  <p className="text-4xl font-display text-brand-green">{inquiries.filter(i => i.status === 'contacted').length}</p>
               </div>
-              <div className="bg-white p-6 rounded-3xl shadow-sm">
+              <div className="bg-brand-green/20 p-6 rounded-3xl shadow-sm">
                  <p className="text-[10px] font-black uppercase text-brand-charcoal/50 tracking-widest mb-2">Staff Members</p>
                  <p className="text-4xl font-display text-brand-green">{staff.length || 1}</p>
               </div>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
-               <div className="bg-white p-8 rounded-[2.5rem] shadow-sm">
+               <div className="bg-brand-blue/20 p-8 rounded-[2.5rem] shadow-sm">
                  <h3 className="font-bold text-lg mb-6 text-brand-charcoal">Inquiries By Type</h3>
                  {inquiries.length > 0 ? (
                    <div className="h-64">
@@ -781,15 +896,15 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                  )}
                </div>
                <div className="bg-brand-pink p-8 rounded-[2.5rem] shadow-sm text-brand-charcoal flex flex-col justify-center">
-                 <div className="w-16 h-16 bg-white rounded-[2rem] flex items-center justify-center mb-6">
+                 <div className="w-16 h-16 bg-brand-pink/20 rounded-[2rem] flex items-center justify-center mb-6">
                     <Zap className="w-8 h-8 text-brand-pink" />
                  </div>
                  <h3 className="text-3xl font-display tracking-tight mb-4">Quick Actions</h3>
                  <p className="font-medium text-sm mb-8 opacity-80">Navigate directly to the management sections or handle pending items.</p>
                  <div className="flex flex-col gap-3">
-                   <button onClick={() => {setActiveTab('inquiries'); setFilter('new');}} className="px-6 py-4 bg-white rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Review New Inquiries ({inquiries.filter(i => i.status === 'new').length})</button>
+                   <button onClick={() => {setActiveTab('inquiries'); setFilter('new');}} className="px-6 py-4 bg-brand-green/20 rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Review New Inquiries ({inquiries.filter(i => i.status === 'new').length})</button>
                    {userRole === 'admin' && (
-                     <button onClick={() => setActiveTab('staff')} className="px-6 py-4 bg-white rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Manage Staff</button>
+                     <button onClick={() => setActiveTab('staff')} className="px-6 py-4 bg-brand-blue/20 rounded-full text-sm font-bold text-left hover:bg-brand-blue transition-all">Manage Staff</button>
                    )}
                  </div>
                </div>
@@ -805,7 +920,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                 </h2>
                 <p className="text-brand-charcoal font-medium mt-2">Managing the future of neurodivergent inclusion.</p>
               </div>
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-2 rounded-[2rem] shadow-sm ">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-brand-pink/20 p-2 rounded-[2rem] shadow-sm ">
                 <div className="flex">
                   <div className="px-6 py-3 border-r border-brand-charcoal/10">
                       <p className="text-[10px] font-black text-brand-charcoal uppercase tracking-widest mb-1">Total</p>
@@ -854,7 +969,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.98 }}
-                      className="bg-white p-8 rounded-[2.5rem] shadow-sm  group hover:border-brand-pink/30 hover:shadow-sm transition-all"
+                      className="bg-brand-green/20 p-8 rounded-[2.5rem] shadow-sm  group hover:border-brand-pink/30 hover:shadow-sm transition-all"
                     >
                       <div className="flex flex-col lg:flex-row gap-8">
                         <div className="flex-grow">
@@ -923,7 +1038,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                           {inquiry.status !== 'archived' && (
                             <button 
                               onClick={() => handleUpdateStatus(inquiry.id, 'archived')}
-                              className="flex-grow lg:flex-none py-4 bg-white  text-brand-charcoal rounded-[2rem] text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all cursor-pointer"
+                              className="flex-grow lg:flex-none py-4 bg-brand-blue/20  text-brand-charcoal rounded-[2rem] text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all cursor-pointer"
                             >
                               Archive
                             </button>
@@ -956,7 +1071,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                 <h3 className="text-[11px] font-black uppercase tracking-[3px] text-brand-charcoal mb-6">Current Staff</h3>
                 <div className="grid gap-4">
                   {staff.map(member => (
-                    <div key={member.id} className="bg-white p-8 rounded-[2.5rem]  flex items-center justify-between group hover:shadow-sm transition-all">
+                    <div key={member.id} className="bg-brand-pink/20 p-8 rounded-[2.5rem]  flex items-center justify-between group hover:shadow-sm transition-all">
                       <div className="flex items-center gap-6">
                         <div className={`w-12 h-12 rounded-[2rem] flex items-center justify-center font-bold text-brand-charcoal ${member.role === 'admin' ? 'bg-brand-pink' : 'bg-brand-pink'}`}>
                           {member.role === 'admin' ? 'A' : 'M'}
@@ -979,7 +1094,7 @@ const AdminPortal = ({ onExit }: { onExit: () => void }) => {
                 </div>
               </div>
 
-              <div className="bg-white p-12 rounded-[3.5rem] shadow-sm  h-fit sticky top-12">
+              <div className="bg-brand-green/20 p-12 rounded-[3.5rem] shadow-sm  h-fit sticky top-12">
                 <h3 className="text-2xl font-display tracking-tight text-brand-charcoal mb-8">Add New Staff</h3>
                 <form onSubmit={handleAddStaff} className="space-y-6">
                   <div>
@@ -1024,16 +1139,15 @@ const Navbar = () => (
       <div className="flex items-center gap-2 font-display text-brand-charcoal">
         <button 
           onClick={() => (window as any).navigate('home')}
-          className="flex items-center gap-2 group cursor-pointer"
+          className="flex items-center gap-3 group cursor-pointer"
         >
-          <div className="w-8 h-8 bg-brand-pink rounded-lg flex items-center justify-center font-bold text-brand-charcoal group-hover:scale-110 transition-transform">S</div>
-          <span className="font-bold text-xl tracking-tight text-brand-charcoal uppercase letter-spacing-[-0.5px] hidden sm:block">The Scaffold Initiative</span>
+          <ScaffoldLogo className="w-10 h-10 transition-transform group-hover:scale-[1.10]" />
+          <span className="font-bold text-xl tracking-tight text-brand-charcoal uppercase letter-spacing-[-0.5px] hidden sm:block font-display">The Scaffold Initiative</span>
         </button>
       </div>
-      <div className="hidden md:flex items-center gap-8 text-brand-charcoal">
+      <div className="hidden md:flex items-center gap-6 text-brand-charcoal">
         <button onClick={() => (window as any).navigate('about')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">About</button>
         <button onClick={() => (window as any).navigate('impact')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Impact</button>
-        <button onClick={() => (window as any).navigate('model')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Model</button>
         <button onClick={() => (window as any).navigate('team')} className="text-sm font-semibold hover:text-brand-pink transition-colors cursor-pointer">Core Team</button>
         <a 
           href="https://www.instagram.com/the.scaffold.initiative?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
@@ -1043,6 +1157,7 @@ const Navbar = () => (
         >
           <Instagram className="w-5 h-5" />
         </a>
+
         <button 
           onClick={() => (window as any).navigate('partner')}
           className="px-6 py-2.5 bg-brand-pink text-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all hover:scale-105 cursor-pointer"
@@ -1055,41 +1170,56 @@ const Navbar = () => (
 );
 
 const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-brand-blue/10">
+  <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-gradient-to-tr from-brand-pink/30 via-brand-cream to-brand-blue/35">
     {/* Decorative Elements */}
-    <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-10 blur-3xl rounded-full" />
-    <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-20 blur-3xl rounded-full" />
-    <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-brand-green opacity-20 blur-3xl rounded-full" />
+    <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-25 blur-3xl rounded-full" />
+    <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-35 blur-3xl rounded-full" />
+    <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-brand-green opacity-30 blur-3xl rounded-full" />
     
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
-      <div className="max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
-            EST. FEB 2026
-          </span>
-          <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
-            Redefining inclusion 
-            <span className="block italic mt-2 opacity-90 font-display">for neurodivergent students</span>
-          </h1>
-          <p className="text-lg md:text-xl text-brand-charcoal mb-10 leading-relaxed max-w-2xl font-medium">
-            Bridging the gap between diagnosis and support in Tier 2 and Tier 3 regions across India, Thailand, Spain, and the UAE. Providing structure and care where students need it most.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <button onClick={() => (window as any).navigate('impact')} className="px-8 py-4 bg-brand-pink text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all flex items-center gap-3 group shadow-sm shadow-brand-charcoal/10">
-              View Impact <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button 
-              onClick={() => (window as any).navigate('partner')}
-              className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
-            >
-              Partner With Us
-            </button>
-          </div>
-        </motion.div>
+      <div className="grid lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
+              EST. FEB 2026
+            </span>
+            <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
+              Redefining inclusion 
+              <span className="block italic mt-2 opacity-90 font-display">for neurodivergent students</span>
+            </h1>
+            <p className="text-lg md:text-xl text-brand-charcoal mb-10 leading-relaxed max-w-2xl font-medium">
+              Bridging the gap between diagnosis and support in Tier 2 and Tier 3 regions across India, Thailand, Spain, and the UAE. Providing structure and care where students need it most.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <button onClick={() => (window as any).navigate('impact')} className="px-8 py-4 bg-brand-pink text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all flex items-center gap-3 group shadow-sm shadow-brand-charcoal/10">
+                View Impact <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button 
+                onClick={() => (window as any).navigate('partner')}
+                className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
+              >
+                Partner With Us
+              </button>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Brand Illustrated Logo Showcase */}
+        <div className="lg:col-span-5 flex justify-center items-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            className="p-8 md:p-12 bg-white/45 backdrop-blur-md rounded-[4rem] border-2 border-brand-pink/30 hover:border-brand-pink/60 transition-all duration-300 shadow-xl shadow-brand-charcoal/5 flex justify-center items-center"
+          >
+            <ScaffoldLogo size={320} className="w-64 h-64 md:w-80 md:h-80 drop-shadow-xl" />
+          </motion.div>
+        </div>
       </div>
       
       {/* Impact Strip */}
@@ -1138,12 +1268,12 @@ const About = () => (
               We focus on academic inclusion for neurodivergent students in underserved Tier 2 and Tier 3 regions, ensuring that mental well-being is never an afterthought in the classroom.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-8 bg-white rounded-3xl shadow-sm ">
+              <div className="p-8 bg-brand-blue/20 rounded-3xl shadow-sm ">
                 <Users className="w-10 h-10 text-brand-pink mb-6" />
                 <h4 className="font-bold text-xl mb-3">Youth-Led Advocacy</h4>
                 <p className="text-brand-charcoal leading-relaxed text-sm">Built and driven by those who understand the modern educational landscape from the inside.</p>
               </div>
-              <div className="p-8 bg-white rounded-3xl shadow-sm ">
+              <div className="p-8 bg-brand-pink/20 rounded-3xl shadow-sm ">
                 <Heart className="w-10 h-10 text-brand-pink mb-6" />
                 <h4 className="font-bold text-xl mb-3">Holistic Well-being</h4>
                 <p className="text-brand-charcoal leading-relaxed text-sm">Centering compassion and mental health as fundamental pillars of academic success.</p>
@@ -1188,7 +1318,7 @@ const Timeline = () => (
         <p className="max-w-2xl mx-auto text-brand-charcoal text-lg font-medium">From concept to active operations, driving neurodivergent inclusion regionally.</p>
       </div>
 
-      <div className="bg-brand-green/20 text-brand-charcoal p-12 md:p-20 rounded-[4rem] relative shadow-sm">
+      <div className="bg-brand-green/20 border-2 border-brand-green/35 text-brand-charcoal p-12 md:p-20 rounded-[4rem] relative shadow-lg shadow-brand-green/5">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <h3 className="text-4xl md:text-5xl mb-12 font-display text-brand-charcoal">Impact Mapping</h3>
@@ -1200,8 +1330,8 @@ const Timeline = () => (
                 { date: "March 2026", task: "Commenced 90-Day Impact Pipeline Planning" }
               ].map((m, i) => (
                 <div key={i} className="flex gap-6">
-                  <div className="w-px h-full bg-brand-charcoal/10 mt-2 relative">
-                    <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-brand-pink shadow-[0_0_10px_rgba(240,98,146,0.8)]" />
+                  <div className="w-px h-full bg-brand-charcoal/15 mt-2 relative">
+                    <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-brand-pink shadow-[0_0_10px_rgba(248,175,203,0.8)]" />
                   </div>
                   <div>
                     <h4 className="text-xs font-black tracking-[0.2em] uppercase text-brand-pink mb-2">{m.date}</h4>
@@ -1212,7 +1342,7 @@ const Timeline = () => (
             </div>
           </div>
           <div className="relative">
-             <div className="aspect-square bg-brand-blue/20 rounded-full flex items-center justify-center opacity-70 border border-brand-blue/30 mx-auto max-w-sm">
+             <div className="aspect-square bg-brand-blue/25 rounded-full flex items-center justify-center border-2 border-brand-blue/40 mx-auto max-w-sm shadow-md">
                 <Globe className="w-1/2 h-1/2 text-brand-blue drop-shadow-md" />
              </div>
           </div>
@@ -1223,7 +1353,7 @@ const Timeline = () => (
 );
 
 const Pipeline = () => (
-  <section className="py-32 bg-brand-blue/10 relative overflow-hidden">
+  <section className="py-32 bg-brand-pink/10 relative overflow-hidden">
     <div className="max-w-7xl mx-auto px-6 relative z-10">
       <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-20">
         <div className="max-w-2xl">
@@ -1259,69 +1389,41 @@ const Pipeline = () => (
             icon: <Calendar className="w-8 h-8" />,
             label: "Ongoing Rollout"
           }
-        ].map((item, idx) => (
-          <motion.div 
-            key={idx}
-            whileHover={{ y: -12 }}
-            className="bg-white p-12 rounded-[2rem] shadow-sm  group"
-          >
-            <div className="w-16 h-16 bg-brand-cream rounded-[2rem] flex items-center justify-center text-brand-pink mb-10  group-hover:bg-brand-pink group-hover:text-brand-charcoal transition-all duration-500">
-              {item.icon}
-            </div>
-            <p className="text-brand-pink text-[12px] font-bold uppercase tracking-[1.5px] mb-4">{item.label}</p>
-            <h3 className="text-2xl mb-6 font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
-            <p className="text-brand-charcoal leading-relaxed text-sm font-medium">{item.description}</p>
-          </motion.div>
-        ))}
+        ].map((item, idx) => {
+          const cardColors = [
+            "bg-brand-blue/15 border-2 border-brand-blue/30 text-brand-charcoal",
+            "bg-brand-pink/15 border-2 border-brand-pink/30 text-brand-charcoal",
+            "bg-brand-green/15 border-2 border-brand-green/30 text-brand-charcoal"
+          ];
+          const iconColors = [
+            "text-brand-blue group-hover:bg-brand-blue group-hover:text-brand-charcoal",
+            "text-brand-pink group-hover:bg-brand-pink group-hover:text-brand-charcoal",
+            "text-brand-green group-hover:bg-brand-green group-hover:text-brand-charcoal"
+          ];
+          const badgeColors = ["text-brand-blue", "text-brand-pink", "text-brand-green"];
+          
+          return (
+            <motion.div 
+              key={idx}
+              whileHover={{ y: -12 }}
+              className={`${cardColors[idx % 3]} p-12 rounded-[2rem] shadow-sm group transition-all duration-300`}
+            >
+              <div className={`w-16 h-16 bg-brand-cream rounded-[2rem] flex items-center justify-center mb-10 transition-all duration-500 ${iconColors[idx % 3]}`}>
+                {item.icon}
+              </div>
+              <p className={`${badgeColors[idx % 3]} text-[12px] font-bold uppercase tracking-[1.5px] mb-4`}>{item.label}</p>
+              <h3 className="text-2xl mb-6 font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
+              <p className="text-brand-charcoal leading-relaxed text-sm font-medium">{item.description}</p>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   </section>
 );
 
-const SupportModel = () => {
-  const models = [
-    { title: "Academic Inclusion", text: "Direct collaboration with schools to implement practical accommodations and IEPs that empower neurodivergent learners." },
-    { title: "Diagnostic Camps", text: "Subsidized hubs for professional screening and evaluation in tech-underserved Tier 2 and Tier 3 regions." },
-    { title: "Post-Diagnostic Care", text: "A continuous feedback loop and support system for families navigating life after initial diagnosis." },
-    { title: "Peer Support Groups", text: "Guided communities led by trained youth volunteers to foster a sense of belonging and advocacy." },
-    { title: "Helpline Facilitation", text: "Connecting individuals in need with vetted professional resources and crisis support instantly." },
-    { title: "Awareness Sessions", text: "Education-focused sessions designed to dismantle stigma at its root in schools and communities." }
-  ];
-
-  return (
-    <section id="model" className="py-32 bg-brand-mint/10">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-24">
-          <span className="text-[11px] font-bold tracking-[2px] uppercase text-brand-pink mb-4 block">Operational Framework</span>
-          <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter font-display text-brand-charcoal">A Holistic Support Model</h2>
-          <p className="text-brand-charcoal max-w-2xl mx-auto text-lg font-medium">Bridging the gap between initial diagnosis and long-term academic success.</p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {models.map((item, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.05 }}
-              className="p-10  rounded-3xl hover:bg-brand-cream transition-all cursor-default group"
-            >
-              <div className="flex gap-4 items-center mb-6">
-                <div className="w-1.5 h-8 bg-brand-pink rounded-full group-hover:bg-brand-pink transition-all" />
-                <h3 className="text-2xl font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
-              </div>
-              <p className="text-sm text-brand-charcoal leading-relaxed font-medium">{item.text}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="py-32 bg-brand-blue text-brand-charcoal relative overflow-hidden border-t ">
+  <section className="py-32 bg-gradient-to-br from-brand-blue/30 via-brand-cream to-brand-green/25 text-brand-charcoal relative overflow-hidden border-t border-brand-pink/20">
     <div className="absolute inset-0 scaffold-grid opacity-5 pointer-events-none" />
     <div className="max-w-7xl mx-auto px-6 relative z-10">
       <div className="grid lg:grid-cols-2 gap-24 items-center">
@@ -1333,7 +1435,7 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
           </p>
           <div className="space-y-10">
             <div className="flex gap-6">
-               <div className="w-14 h-14 rounded-[2rem] bg-white/5 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
+               <div className="w-14 h-14 rounded-[2rem] bg-brand-cream/10 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
                  <Zap className="w-7 h-7 text-brand-pink group-hover:text-brand-charcoal transition-colors" />
                </div>
                <div>
@@ -1342,7 +1444,7 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
                </div>
             </div>
             <div className="flex gap-6">
-               <div className="w-14 h-14 rounded-[2rem] bg-white/5 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
+               <div className="w-14 h-14 rounded-[2rem] bg-brand-cream/10 flex-shrink-0 flex items-center justify-center  group hover:bg-brand-pink transition-all">
                  <Sparkles className="w-7 h-7 text-brand-pink group-hover:text-brand-charcoal transition-colors" />
                </div>
                <div>
@@ -1352,7 +1454,7 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
             </div>
           </div>
         </div>
-        <div className="bg-white/5 p-16 rounded-[3rem]   relative">
+        <div className="bg-brand-cream/10 p-16 rounded-[3rem]   relative">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-pink opacity-10 blur-3xl" />
           <h3 className="text-5xl font-display mb-10 text-brand-charcoal leading-tight tracking-tighter">The Scaffold is the bridge.</h3>
           <p className="text-lg opacity-60 leading-relaxed mb-12 font-medium italic">
@@ -1410,9 +1512,9 @@ const Footer = () => (
         <p>© 2026 THE SCAFFOLD INITIATIVE.</p>
         <div className="flex gap-8 px-8 py-3  rounded-full items-center">
           <p>Global Advocacy</p>
-          <div className="w-px h-3 bg-white/20" />
+          <div className="w-px h-3 bg-brand-blue/30" />
           <p>Youth-Led Project</p>
-          <div className="w-px h-3 bg-white/20" />
+          <div className="w-px h-3 bg-brand-pink/30" />
           <button 
             onClick={() => (window as any).navigate('admin')} 
             className="hover:text-brand-cream transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
@@ -1426,24 +1528,24 @@ const Footer = () => (
 );
 
 const FinalCTA = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="py-40 bg-brand-blue/20 relative overflow-hidden text-center border-t border-brand-blue/30">
+  <section className="py-40 bg-brand-pink/15 relative overflow-hidden text-center border-t border-brand-pink/25">
      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-brand-pink opacity-[0.05] blur-3xl rounded-full" />
      <div className="max-w-5xl mx-auto px-6 relative z-10">
         <span className="text-[11px] font-bold tracking-[4px] uppercase text-brand-pink mb-8 block">Call to Action</span>
         <h2 className="text-6xl md:text-9xl mb-16 font-display leading-none tracking-tighter leading-[0.85] text-brand-charcoal">Will you help us build the next scaffold?</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            "Partner With Us",
-            "Support a Camp",
-            "Bring Us to School",
-            "Join Volunteers"
-          ].map((text, i) => (
+            { text: "Partner With Us", style: "bg-brand-blue/15 hover:bg-brand-blue/25 border-brand-blue/30 shadow-brand-blue/5" },
+            { text: "Support a Camp", style: "bg-brand-pink/20 hover:bg-brand-pink/30 border-brand-pink/35 shadow-brand-pink/5" },
+            { text: "Bring Us to School", style: "bg-brand-green/15 hover:bg-brand-green/25 border-brand-green/30 shadow-brand-green/5" },
+            { text: "Join Volunteers", style: "bg-brand-pink/25 hover:bg-brand-pink/35 border-brand-pink/45 shadow-brand-pink/10" }
+          ].map((item, i) => (
             <button 
               key={i} 
               onClick={onViewPartner}
-              className="py-12 bg-white  rounded-3xl hover:shadow-sm hover:shadow-brand-pink/10 transition-all font-display font-medium text-xl text-brand-charcoal cursor-pointer group"
+              className={`py-12 ${item.style} border-2 rounded-3xl hover:-translate-y-1 hover:shadow-lg transition-all duration-300 font-display font-medium text-xl text-brand-charcoal cursor-pointer group`}
             >
-              <span className="group-hover:scale-110 block transition-transform">{text}</span>
+              <span className="group-hover:scale-105 block transition-transform">{item.text}</span>
             </button>
           ))}
         </div>
@@ -1452,28 +1554,57 @@ const FinalCTA = ({ onViewPartner }: { onViewPartner: () => void }) => (
 );
 
 
+
+
 const TeamPage = () => (
   <section className="min-h-[80vh] bg-brand-cream py-32 px-6 flex flex-col justify-center">
-    <div className="max-w-7xl mx-auto text-center">
+    <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <div className="w-24 h-24 bg-brand-pink/20 text-brand-pink rounded-[2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
+        <div className="w-24 h-24 bg-brand-pink/20 text-brand-pink rounded-[2.2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
           <Users className="w-12 h-12" />
         </div>
         <h1 className="text-5xl md:text-7xl font-display text-brand-charcoal mb-6 tracking-tighter">Meet The Team</h1>
-        <p className="text-lg text-brand-charcoal max-w-2xl mx-auto font-medium mb-12">
-          The core team details will be revealed shortly. Stay tuned!
+        <p className="text-lg text-brand-charcoal/80 max-w-2xl mx-auto font-medium">
+          The core team details will be revealed shortly. Here is an overview of our organizational structure.
         </p>
       </div>
 
-      <div className="mb-20 py-20 bg-brand-blue/5 rounded-[2.5rem] border border-brand-blue/10 max-w-2xl mx-auto shadow-sm">
-        <h2 className="text-3xl font-display text-brand-charcoal mb-4">Coming Soon</h2>
-        <p className="text-brand-charcoal/70 font-medium">We are putting together an incredible global team.</p>
+      <div className="grid md:grid-cols-3 gap-8 mb-20 max-w-5xl mx-auto">
+        <div className="bg-brand-blue/15 border-2 border-brand-blue/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+          <div className="w-16 h-16 bg-brand-blue text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <span className="px-4 py-1.5 bg-brand-blue/20 text-brand-blue border border-brand-blue/30 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Advisory & Psychiatry</span>
+          <h3 className="text-2xl font-display text-brand-charcoal mb-4">Clinical Liaison</h3>
+          <p className="text-sm text-brand-charcoal/80 font-medium">Coordination of psychiatrists, support screening networks, and diagnostic partners.</p>
+          <div className="mt-8 text-xs font-black uppercase text-brand-blue tracking-[2px] opacity-65">Revealing Soon</div>
+        </div>
+
+        <div className="bg-brand-pink/20 border-2 border-brand-pink/35 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+          <div className="w-16 h-16 bg-brand-pink text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Users className="w-8 h-8" />
+          </div>
+          <span className="px-4 py-1.5 bg-brand-pink/25 text-brand-pink border border-brand-pink/40 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Youth Leadership</span>
+          <h3 className="text-2xl font-display text-brand-charcoal mb-4">Global Facilitators</h3>
+          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Driving outreach in India, Spain, UAE, and Thailand with structured regional leadership.</p>
+          <div className="mt-8 text-xs font-black uppercase text-brand-pink tracking-[2px] opacity-75">Revealing Soon</div>
+        </div>
+
+        <div className="bg-brand-green/15 border-2 border-brand-green/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+          <div className="w-16 h-16 bg-brand-green text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Heart className="w-8 h-8" />
+          </div>
+          <span className="px-4 py-1.5 bg-brand-green/20 text-brand-green border border-brand-green/35 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Inclusion Outreach</span>
+          <h3 className="text-2xl font-display text-brand-charcoal mb-4">School Liaison Hub</h3>
+          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Empowering students through school-specific academic scaffolds and curriculum planning.</p>
+          <div className="mt-8 text-xs font-black uppercase text-brand-green tracking-[2px] opacity-65">Revealing Soon</div>
+        </div>
       </div>
       
       <div className="text-center">
         <button 
           onClick={() => (window as any).navigate('home')}
-          className="px-8 py-4 bg-brand-charcoal text-brand-cream rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all shadow-sm"
+          className="px-8 py-4 bg-brand-charcoal text-brand-cream rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all shadow-sm cursor-pointer"
         >
           Return Home
         </button>
@@ -1537,7 +1668,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
   const OptionCard = ({ icon, title, desc, type }: { icon: any, title: string, desc: string, type: any }) => (
     <div 
       onClick={() => setPartnerType(type)}
-      className="p-8 bg-white rounded-3xl cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-pink/10 transition-all border border-brand-charcoal/10"
+      className="p-8 bg-brand-blue/20 rounded-3xl cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-pink/10 transition-all border border-brand-charcoal/10"
     >
       <div className="w-16 h-16 bg-brand-pink/20 rounded-2xl flex items-center justify-center text-brand-pink mb-6">
         {icon}
@@ -1578,7 +1709,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
             >
               <ChevronRight className="w-4 h-4 rotate-180" /> Choose another option
             </button>
-            <div className="bg-white p-10 md:p-16 rounded-[3rem] shadow-sm border border-brand-charcoal/10">
+            <div className="bg-brand-pink/20 p-10 md:p-16 rounded-[3rem] shadow-sm border border-brand-charcoal/10">
               <h2 className="text-3xl md:text-4xl font-display text-brand-charcoal mb-4 capitalize">
                 {partnerType === "school" ? "School Partnership" :
                  partnerType === "volunteer" ? "Volunteer Application" :
@@ -1619,7 +1750,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
                       <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" placeholder="jane@example.com" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">WhatsApp (Optional)</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-charcoal/50 mb-2 px-4">WhatsApp</label>
                       <div className="flex gap-2">
     <input 
     type="text"
@@ -1873,6 +2004,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
   </datalist>
   <input 
     type="tel" 
+    required
     value={formData.whatsapp} 
     onChange={e => setFormData({...formData, whatsapp: e.target.value})} 
     className="flex-1 px-6 py-4 bg-brand-cream/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-pink/50 transition-all font-medium border border-transparent" 
@@ -1933,7 +2065,7 @@ export default function App() {
 
   // Layout wrapper for site pages
   return (
-    <div className="bg-brand-white selection:bg-brand-blue selection:text-brand-charcoal font-sans min-h-screen flex flex-col">
+    <div className="bg-brand-cream selection:bg-brand-pink selection:text-brand-charcoal font-sans min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-grow flex flex-col">
         {view === "home" && (
@@ -1960,14 +2092,6 @@ export default function App() {
               <WhyMatters onViewPartner={() => (window as any).navigate('partner')} />
               <Pipeline />
             </div>
-          </>
-        )}
-        {view === "model" && (
-          <>
-            <div className="pt-20">
-              <SupportModel />
-            </div>
-            <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
           </>
         )}
         {view === "team" && (

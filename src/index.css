@@ -5,15 +5,15 @@
   --font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
 
-  --color-brand-pink: #F5AFC3;
-  --color-brand-green: #A8B987;
-  --color-brand-teal: #7FC7D3;
-  --color-brand-blue: #A2D5F2;
-  --color-brand-mint: #C8E6C9;
-  --color-brand-cream: #F7F7F4;
-  --color-brand-white: #ffffff;
-  --color-brand-plum: #1E1E1E; /* Mapped to Charcoal for existing classes */
-  --color-brand-charcoal: #1E1E1E;
+  --color-brand-pink: #F8AFCB;
+  --color-brand-green: #97BA9B;
+  --color-brand-teal: #68BAC6;
+  --color-brand-blue: #8CD0E8;
+  --color-brand-mint: #BCE2C2;
+  --color-brand-cream: #E7F3E9; /* Premium Soft Sage background theme */
+  --color-brand-white: #EFF7F1; /* Premium Mint-white card tone */
+  --color-brand-plum: #11321C; /* Elegant Deep Pine Forest primary text */
+  --color-brand-charcoal: #11321C;
 }
 
 @layer base {
@@ -32,7 +32,7 @@
 }
 
 .glass-card {
-  @apply bg-white border-2 border-brand-charcoal rounded-[2rem] shadow-none transition-all duration-300;
+  @apply bg-brand-blue/10 border-2 border-brand-charcoal rounded-[2rem] shadow-none transition-all duration-300;
 }
 
 .gradient-text {

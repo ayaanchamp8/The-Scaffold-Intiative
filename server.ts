@@ -1,7 +1,6 @@
 import express from "express";
 import "dotenv/config";
 import path from "path";
-import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
 import twilio from "twilio";
@@ -14,9 +13,6 @@ import { getFirestore as getAdminFirestore, FieldValue as AdminFieldValue } from
 // Firebase Client SDK Imports (for fallback)
 import { initializeApp as initializeClientApp } from "firebase/app";
 import { getFirestore as getClientFirestore, collection as clientCollection, addDoc as clientAddDoc, serverTimestamp as clientTimestamp } from "firebase/firestore";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Read firebase config
 const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), "firebase-applet-config.json"), "utf8"));
