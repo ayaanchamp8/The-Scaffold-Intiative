@@ -1169,83 +1169,107 @@ const Navbar = () => (
   </nav>
 );
 
-const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => (
-  <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-gradient-to-tr from-brand-pink/30 via-brand-cream to-brand-blue/35">
-    {/* Decorative Elements */}
-    <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-25 blur-3xl rounded-full" />
-    <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-35 blur-3xl rounded-full" />
-    <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-brand-green opacity-30 blur-3xl rounded-full" />
-    
-    <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
-      <div className="grid lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-7">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
-              EST. FEB 2026
-            </span>
-            <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
-              Redefining inclusion 
-              <span className="block italic mt-2 opacity-90 font-display">for neurodivergent students</span>
-            </h1>
-            <p className="text-lg md:text-xl text-brand-charcoal mb-10 leading-relaxed max-w-2xl font-medium">
-              Bridging the gap between diagnosis and support in Tier 2 and Tier 3 regions across India, Thailand, Spain, and the UAE. Providing structure and care where students need it most.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button onClick={() => (window as any).navigate('impact')} className="px-8 py-4 bg-brand-pink text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all flex items-center gap-3 group shadow-sm shadow-brand-charcoal/10">
-                View Impact <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button 
-                onClick={() => (window as any).navigate('partner')}
-                className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
-              >
-                Partner With Us
-              </button>
-            </div>
-          </motion.div>
-        </div>
+const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
+  const [countries, setCountries] = useState(0);
+  const [volunteers, setVolunteers] = useState(0);
+  const [reach, setReach] = useState(0);
+  const [partners, setPartners] = useState(0);
 
-        {/* Brand Illustrated Logo Showcase */}
-        <div className="lg:col-span-5 flex justify-center items-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            whileHover={{ scale: 1.05, rotate: 2 }}
-            className="p-8 md:p-12 bg-white/45 backdrop-blur-md rounded-[4rem] border-2 border-brand-pink/30 hover:border-brand-pink/60 transition-all duration-300 shadow-xl shadow-brand-charcoal/5 flex justify-center items-center"
-          >
-            <ScaffoldLogo size={320} className="w-64 h-64 md:w-80 md:h-80 drop-shadow-xl" />
-          </motion.div>
-        </div>
-      </div>
+  useEffect(() => {
+    let step = 0;
+    const steps = 30;
+    const interval = setInterval(() => {
+      step++;
+      setCountries(Math.min(5, Math.round((5 / steps) * step)));
+      setVolunteers(Math.min(35, Math.round((35 / steps) * step)));
+      setReach(Math.min(15000, Math.round((15000 / steps) * step)));
+      setPartners(Math.min(15, Math.round((15 / steps) * step)));
       
-      {/* Impact Strip */}
-      <motion.div 
-        id="impact"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y  py-12"
-      >
-        {[
-          { label: "Countries Active", value: "4" },
-          { label: "Vetted Volunteers", value: "35+" },
-          { label: "Passive Reach", value: "15,000+" },
-          { label: "School Partnerships", value: "15+" }
-        ].map((stat, i) => (
-          <div key={i}>
-            <p className="text-4xl md:text-5xl font-display font-bold text-brand-pink mb-2">{stat.value}</p>
-            <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[1px]">{stat.label}</p>
+      if (step >= steps) {
+        clearInterval(interval);
+      }
+    }, 40);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="relative min-h-[90vh] pt-32 pb-20 overflow-hidden flex flex-col justify-center scaffold-grid bg-gradient-to-tr from-brand-pink/30 via-brand-cream to-brand-blue/35">
+      {/* Decorative Elements */}
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-brand-pink opacity-25 blur-3xl rounded-full animate-pulse duration-[8000ms]" />
+      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-brand-blue opacity-35 blur-3xl rounded-full animate-pulse duration-[6000ms]" />
+      <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-brand-green opacity-30 blur-3xl rounded-full" />
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-block px-4 py-1.5 bg-brand-blue text-brand-charcoal text-[10px] font-black tracking-[0.2em] uppercase rounded-full mb-8 shadow-sm">
+                EST. FEB 2026
+              </span>
+              <h1 className="text-5xl md:text-7xl mb-8 leading-[1.1] text-brand-charcoal max-w-3xl tracking-tighter">
+                Redefining inclusion 
+                <span className="block italic mt-2 opacity-90 font-display">for neurodivergent students</span>
+              </h1>
+              <p className="text-lg md:text-xl text-brand-charcoal mb-10 leading-relaxed max-w-2xl font-medium">
+                Bridging the gap between diagnosis and support in Tier 2 and Tier 3 regions across India, Thailand, Spain, UAE, and Singapore. Providing structure and care where students need it most.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button onClick={() => (window as any).navigate('impact')} className="px-8 py-4 bg-brand-pink text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-blue hover:text-brand-charcoal hover:shadow-md transition-all flex items-center gap-3 group shadow-sm shadow-brand-charcoal/10 cursor-pointer">
+                  View Impact <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button 
+                  onClick={() => (window as any).navigate('partner')}
+                  className="px-8 py-4 border border-brand-charcoal/10 text-brand-charcoal rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all cursor-pointer"
+                >
+                  Partner With Us
+                </button>
+              </div>
+            </motion.div>
           </div>
-        ))}
-      </motion.div>
-    </div>
-  </section>
-);
+
+          {/* Brand Illustrated Logo Showcase */}
+          <div className="lg:col-span-5 flex justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              className="p-8 md:p-12 bg-white/45 backdrop-blur-md rounded-[4rem] border-2 border-brand-pink/30 hover:border-brand-pink/60 transition-all duration-300 shadow-xl shadow-brand-charcoal/5 flex justify-center items-center cursor-pointer"
+            >
+              <ScaffoldLogo size={320} className="w-64 h-64 md:w-80 md:h-80 drop-shadow-xl" />
+            </motion.div>
+          </div>
+        </div>
+        
+        {/* Impact Strip */}
+        <motion.div 
+          id="impact"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-brand-charcoal/10 py-12"
+        >
+          {[
+            { label: "Countries Active", value: `${countries}` },
+            { label: "Vetted Volunteers", value: `${volunteers}+` },
+            { label: "Passive Reach", value: `${reach.toLocaleString()}+` },
+            { label: "School Partnerships", value: `${partners}+` }
+          ].map((stat, i) => (
+            <div key={i} className="hover:scale-105 transition-transform duration-300">
+              <p className="text-4xl md:text-5xl font-display font-bold text-brand-pink mb-2">{stat.value}</p>
+              <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[1px]">{stat.label}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
 
 const About = () => (
   <section id="about" className="py-32 bg-brand-mint/20 overflow-hidden">
@@ -1309,118 +1333,737 @@ const About = () => (
   </section>
 );
 
-const Timeline = () => (
-  <section className="py-32 bg-brand-blue/10 relative overflow-hidden">
-    <div className="max-w-7xl mx-auto px-6 relative z-10">
-      <div className="text-center mb-20">
-        <span className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">Proven Scalability</span>
-        <h2 className="text-5xl md:text-6xl mb-8 tracking-tighter font-display text-brand-charcoal">The Timeline of Growth</h2>
-        <p className="max-w-2xl mx-auto text-brand-charcoal text-lg font-medium">From concept to active operations, driving neurodivergent inclusion regionally.</p>
-      </div>
+// --- INTERACTIVE INCLUSION SANDBOX & EMULATION SUITE ---
 
-      <div className="bg-brand-green/20 border-2 border-brand-green/35 text-brand-charcoal p-12 md:p-20 rounded-[4rem] relative shadow-lg shadow-brand-green/5">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <h3 className="text-4xl md:text-5xl mb-12 font-display text-brand-charcoal">Impact Mapping</h3>
-            <div className="space-y-12">
-              {[
-                { date: "Feb 1, 2026", task: "Initiative Launch & Global Identity Reveal" },
-                { date: "Feb 15, 2026", task: "Secured 15+ School Partnerships" },
-                { date: "Feb 28, 2026", task: "Volunteer Network Expanded to 4 Hubs" },
-                { date: "March 2026", task: "Commenced 90-Day Impact Pipeline Planning" }
-              ].map((m, i) => (
-                <div key={i} className="flex gap-6">
-                  <div className="w-px h-full bg-brand-charcoal/15 mt-2 relative">
-                    <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-brand-pink shadow-[0_0_10px_rgba(248,175,203,0.8)]" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black tracking-[0.2em] uppercase text-brand-pink mb-2">{m.date}</h4>
-                    <p className="text-lg font-bold">{m.task}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="relative">
-             <div className="aspect-square bg-brand-blue/25 rounded-full flex items-center justify-center border-2 border-brand-blue/40 mx-auto max-w-sm shadow-md">
-                <Globe className="w-1/2 h-1/2 text-brand-blue drop-shadow-md" />
-             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
+const startLowFreqSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return null;
+    const ctx = new AudioContextClass();
+    
+    // Low alpha/theta state hum oscillator
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = "sine";
+    osc.frequency.value = 85; 
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 100;
+    
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.8); 
+    
+    osc.start();
+    return { ctx, osc, gain };
+  } catch (e) {
+    console.warn("Web Audio not supported or blocked", e);
+    return null;
+  }
+};
 
-const Pipeline = () => (
-  <section className="py-32 bg-brand-pink/10 relative overflow-hidden">
-    <div className="max-w-7xl mx-auto px-6 relative z-10">
-      <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-20">
-        <div className="max-w-2xl">
-          <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-4 block">Future Outlook</span>
-          <h2 className="text-5xl md:text-7xl mb-8 tracking-tighter font-display text-brand-charcoal">90-Day Impact Pipeline</h2>
-          <p className="text-brand-charcoal leading-relaxed text-lg font-medium">
-            Active scaling across North India, focused on high-engagement school environments and community diagnostic hubs.
+const stopLowFreqSound = (sound: { ctx: AudioContext; osc: OscillatorNode; gain: GainNode } | null) => {
+  if (sound) {
+    try {
+      const { ctx, osc, gain } = sound;
+      gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
+      setTimeout(() => {
+        try {
+          osc.stop();
+          ctx.close();
+        } catch (err) {}
+      }, 500);
+    } catch (e) {
+      console.warn("Failed to stop soundscape gracefully", e);
+    }
+  }
+};
+
+const InclusionSandbox = () => {
+  const [activeTab, setActiveTab] = useState<"adhd" | "autism" | "dyslexia" | "sensory">("adhd");
+  
+  // ADHD State
+  const [adhdDistraction, setAdhdDistraction] = useState(60); 
+  const [adhdScaffold, setAdhdScaffold] = useState(false);
+  const [audioFocusPlaying, setAudioFocusPlaying] = useState(false);
+  const [synthSound, setSynthSound] = useState<any>(null);
+  const [jitterTick, setJitterTick] = useState(0);
+
+  // Autism State
+  const [autismSenses, setAutismSenses] = useState(70); 
+  const [autismScaffold, setAutismScaffold] = useState(false);
+  const [countdownTime, setCountdownTime] = useState(120); 
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [pulseTick, setPulseTick] = useState(0);
+
+  // Dyslexia State
+  const [dyslexiaScaffold, setDyslexiaScaffold] = useState(false);
+  const [dyslexiaTheme, setDyslexiaTheme] = useState<"mint" | "peach" | "blue">("mint");
+  const [isDictating, setIsDictating] = useState(false);
+
+  // Sensory State
+  const [sensoryGlare, setSensoryGlare] = useState(80); 
+  const [sensoryScaffold, setSensoryScaffold] = useState(false);
+  const [restCycleActive, setRestCycleActive] = useState(false);
+  const [eyeProgress, setEyeProgress] = useState(100);
+
+  // ADHD text jitter simulator
+  useEffect(() => {
+    let interval: any;
+    if (!adhdScaffold && adhdDistraction > 10) {
+      interval = setInterval(() => {
+        setJitterTick(prev => prev + 1);
+      }, 60);
+    }
+    return () => clearInterval(interval);
+  }, [adhdScaffold, adhdDistraction]);
+
+  // Web Audio trigger for focus sounds
+  useEffect(() => {
+    if (audioFocusPlaying && adhdScaffold && activeTab === "adhd") {
+      const sound = startLowFreqSound();
+      setSynthSound(sound);
+    } else {
+      if (synthSound) {
+        stopLowFreqSound(synthSound);
+        setSynthSound(null);
+      }
+    }
+    return () => {
+      if (synthSound) {
+        stopLowFreqSound(synthSound);
+      }
+    };
+  }, [audioFocusPlaying, adhdScaffold, activeTab]);
+
+  // Autism heartbeat simulation pulse and timer
+  useEffect(() => {
+    let pulseInterval: any;
+    if (!autismScaffold && autismSenses > 20) {
+      pulseInterval = setInterval(() => {
+        setPulseTick(prev => (prev + 1) % 4);
+      }, 250);
+    }
+    return () => clearInterval(pulseInterval);
+  }, [autismScaffold, autismSenses]);
+
+  useEffect(() => {
+    let timerInterval: any;
+    if (timerRunning && countdownTime > 0) {
+      timerInterval = setInterval(() => {
+        setCountdownTime(prev => prev - 1);
+      }, 1000);
+    } else if (countdownTime === 0) {
+      setTimerRunning(false);
+    }
+    return () => clearInterval(timerInterval);
+  }, [timerRunning, countdownTime]);
+
+  // Sensory Progress breakdown for ocular tracking exercises
+  useEffect(() => {
+    let progressInterval: any;
+    if (restCycleActive) {
+      progressInterval = setInterval(() => {
+        setEyeProgress(prev => {
+          if (prev <= 0) {
+            setRestCycleActive(false);
+            return 100;
+          }
+          return prev - 2.5; 
+        });
+      }, 100);
+    }
+    return () => clearInterval(progressInterval);
+  }, [restCycleActive]);
+
+  // speech dictation helper
+  const handleDictate = (text: string) => {
+    if ("speechSynthesis" in window) {
+      if (isDictating) {
+        window.speechSynthesis.cancel();
+        setIsDictating(false);
+      } else {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.onend = () => setIsDictating(false);
+        utterance.onerror = () => setIsDictating(false);
+        setIsDictating(true);
+        window.speechSynthesis.speak(utterance);
+      }
+    } else {
+      alert("Text-to-speech functionality is not supported in the active browser.");
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const getJitterStyle = () => {
+    if (adhdScaffold || adhdDistraction <= 15) return {};
+    const intensity = (adhdDistraction - 15) / 12;
+    const x = (Math.sin(jitterTick * 1.8) * intensity).toFixed(1);
+    const y = (Math.cos(jitterTick * 2.2) * intensity).toFixed(1);
+    const scale = (1 + (Math.sin(jitterTick * 0.9) * (intensity / 100))).toFixed(3);
+    return { transform: `translate(${x}px, ${y}px) scale(${scale})` };
+  };
+
+  const getSensoryBackground = () => {
+    if (sensoryScaffold) return "bg-brand-cream/40";
+    const intensity = sensoryGlare / 100;
+    return `linear-gradient(${135 + (intensity * 40)}deg, rgba(255,255,255,${0.3 + intensity * 0.6}) 0%, rgba(220,230,220,0.15) 100%)`;
+  };
+
+  return (
+    <section id="sandbox" className="py-32 bg-brand-cream relative overflow-hidden scroll-mt-20 border-t border-brand-charcoal/5">
+      <div className="absolute top-0 right-0 w-80 h-80 bg-brand-green/10 rounded-full blur-3xl -mr-20 -mt-20" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-pink/15 rounded-full blur-3xl -ml-20 -mb-20" />
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="text-center mb-16">
+          <span className="text-[11px] font-black tracking-[0.25em] uppercase text-brand-pink mb-4 block">Inclusive Sandbox</span>
+          <h2 className="text-5xl md:text-6xl mb-6 tracking-tighter font-display text-brand-charcoal">Experience the Classroom Scaffold</h2>
+          <p className="max-w-3xl mx-auto text-brand-charcoal text-lg font-medium leading-relaxed">
+            Move sliders to emulate typical neurodivergent sensory/focus environments. Then, engage the "Scaffold" switch to experience how simple pedagogical structures restore comfort and concentration!
           </p>
         </div>
-        <div className="flex flex-col items-end">
-          <p className="text-7xl md:text-9xl font-display text-brand-charcoal leading-none tracking-tighter">2,000+</p>
-          <p className="text-[11px] font-bold text-brand-charcoal uppercase tracking-[2px] mt-4">Projected Students Affected by July</p>
+
+        {/* Tab Selection Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {[
+            { id: "adhd", label: "ADHD Sprinting", color: "border-brand-pink hover:bg-brand-pink/10 text-brand-pink", desc: "Executive function burst cycles" },
+            { id: "autism", label: "Autism Safety", color: "border-brand-blue hover:bg-brand-blue/10 text-brand-blue", desc: "Predictable routines & transitions" },
+            { id: "dyslexia", label: "Dyslexia Reader", color: "border-brand-green hover:bg-brand-green/10 text-brand-green", desc: "Multi-sensory text formatting" },
+            { id: "sensory", label: "Sensory Dampener", color: "border-brand-teal hover:bg-brand-teal/10 text-brand-teal", desc: "Environmental glare & rest buffers" }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                // Cancel speaking and sounds when switching tabs
+                if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+                setIsDictating(false);
+                setAudioFocusPlaying(false);
+                setActiveTab(tab.id as any);
+              }}
+              className={`p-6 border-2 text-left rounded-[2rem] transition-all duration-300 group cursor-pointer ${
+                activeTab === tab.id 
+                  ? "bg-brand-charcoal border-brand-charcoal text-brand-white shadow-lg shadow-brand-charcoal/10 scale-[1.02]" 
+                  : "bg-white border-brand-charcoal/10 hover:-translate-y-1 hover:border-brand-charcoal/30"
+              }`}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <span className={`w-3 h-3 rounded-full ${activeTab === tab.id ? "bg-brand-pink" : "bg-brand-charcoal/25"}`} />
+                <ArrowRight className={`w-4 h-4 transition-transform ${activeTab === tab.id ? "text-brand-pink translate-x-0.5" : "text-brand-charcoal/30 group-hover:translate-x-1"}`} />
+              </div>
+              <h4 className={`font-bold tracking-tight text-md mb-1 ${activeTab === tab.id ? "text-white" : "text-brand-charcoal"}`}>{tab.label}</h4>
+              <p className={`text-[11px] font-medium leading-relaxed uppercase tracking-wider ${activeTab === tab.id ? "text-brand-cream/70" : "text-brand-charcoal/55"}`}>{tab.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Simulation Window Bento Grid */}
+        <div className="bg-white border-2 border-brand-charcoal/10 rounded-[3rem] p-8 md:p-14 shadow-xl shadow-brand-charcoal/5 relative overflow-hidden">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            
+            {/* COLUMN 1: INTERACTIVE VIEWPORT (7/12 cols) */}
+            <div className="lg:col-span-7 flex flex-col h-full justify-between min-h-[420px]">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-2.5 w-2.5 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-pink opacity-75"></span>
+                    <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${adhdScaffold || autismScaffold || dyslexiaScaffold || sensoryScaffold ? "bg-brand-green" : "bg-rose-500"}`}></span>
+                  </span>
+                  <span className="text-[11px] font-black tracking-[0.15em] uppercase text-brand-charcoal/50">
+                    Simulation Viewport
+                  </span>
+                </div>
+                <div className="px-3 py-1 bg-brand-cream text-brand-charcoal border border-brand-charcoal/15 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                  {adhdScaffold || autismScaffold || dyslexiaScaffold || sensoryScaffold ? "🔴 Scaffold Engaged" : "⚠️ Emulated Un-Scaffolded State"}
+                </div>
+              </div>
+
+              {/* SIMULATED VIEWPORT FRAME */}
+              <AnimatePresence mode="wait">
+                {activeTab === "adhd" && (
+                  <motion.div
+                    key="adhd-screen"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-grow flex flex-col justify-center bg-brand-cream/35 border-2 border-dashed border-brand-charcoal/10 rounded-2xl p-8 relative overflow-hidden"
+                  >
+                    {/* Floating ADHD stress particles representing attention splinters */}
+                    {!adhdScaffold && adhdDistraction > 20 && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-60">
+                        {Array.from({ length: Math.min(15, Math.ceil(adhdDistraction / 6)) }).map((_, i) => (
+                          <div 
+                            key={i} 
+                            style={{ 
+                              top: `${(Math.sin(i * 143) * 50 + 50).toFixed(0)}%`, 
+                              left: `${(Math.cos(i * 261) * 50 + 50).toFixed(0)}%`,
+                              transform: `scale(${0.5 + Math.sin(jitterTick * 0.1 + i) * 0.5})`
+                            }}
+                            className="absolute px-2.5 py-1 text-[9px] font-bold uppercase rounded-full border bg-brand-pink/15 border-brand-pink text-brand-pink/90 pointer-events-none"
+                          >
+                            {["noise", "sighs", "daydreams", "movement", "flutter", "fidget", "fancies"][i % 7]}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div style={getJitterStyle()} className="transition-all duration-100 ease-out z-10 w-full">
+                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Daily Mathematics Operations</h3>
+                      
+                      {adhdScaffold ? (
+                        <div className="space-y-4">
+                          <p className="text-brand-charcoal text-sm font-semibold mb-2 bg-brand-green/10 border border-brand-green/30 p-3 rounded-xl flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-brand-green" /> 
+                            <strong>Executive Sprint Engaged:</strong> 15-Minute focus window. Micro-chunking enabled:
+                          </p>
+                          <div className="grid gap-3">
+                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                              <input type="checkbox" defaultChecked className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
+                              <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">1. Sketch visual circles representing 14 elements (3 mins)</span>
+                            </label>
+                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                              <input type="checkbox" className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
+                              <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">2. Group elements into pairs of matching counts (7 mins)</span>
+                            </label>
+                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                              <input type="checkbox" className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
+                              <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">3. Solve multiplication remainder ratio (5 mins)</span>
+                            </label>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-brand-charcoal/70 leading-relaxed font-medium">
+                          Today we are going to study the fractions module. Please read Chapter 4 page 112 through page 150 thoroughly and answer the forty complex multi-tier exercises written under the margin columns. Ensure all questions are complete before Tuesday morning classes. Avoid making minor scaling errors on homework papers!
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "autism" && (
+                  <motion.div
+                    key="autism-screen"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex-grow flex flex-col justify-center border-2 rounded-2xl p-8 relative overflow-hidden transition-all duration-300 ${
+                      autismScaffold 
+                        ? "bg-brand-cream border-brand-green/30" 
+                        : "bg-orange-50 border-orange-500/30"
+                    }`}
+                  >
+                    {/* Visual pulse indicator of background noise overlay */}
+                    {!autismScaffold && autismSenses > 30 && (
+                      <div 
+                        style={{ 
+                          borderColor: pulseTick === 0 ? "#F8AFCB" : pulseTick === 2 ? "#68BAC6" : "transparent",
+                          borderWidth: "12px",
+                        }}
+                        className="absolute inset-0 transition-all duration-300 rounded-[1.2rem] pointer-events-none opacity-45"
+                      />
+                    )}
+
+                    <div className="z-10 w-full relative">
+                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Classroom Space Transition</h3>
+                      
+                      {autismScaffold ? (
+                        <div className="space-y-4">
+                          <div className="p-4 bg-brand-green/10 border border-brand-green/30 rounded-xl mb-4">
+                            <span className="text-xs font-black tracking-wider block text-brand-pink uppercase mb-2">Classroom Rule Tracker</span>
+                            <p className="text-sm font-bold text-brand-charcoal leading-relaxed leading-[1.6]">
+                              1. Pack your materials inside the <span className="bg-white border px-1.5 py-0.5 rounded font-mono text-xs">SAGE CONTAINER #3</span>.
+                            </p>
+                            <p className="text-sm font-bold text-brand-charcoal leading-relaxed leading-[1.6] mt-2">
+                              2. Stand near your designated <span className="bg-white border px-1.5 py-0.5 rounded font-mono text-xs font-bold text-brand-pink">CIRCULAR MAT #B</span>.
+                            </p>
+                          </div>
+                          
+                          {/* Visual Sand Timer Countdown */}
+                          <div className="bg-white border-2 border-brand-charcoal p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-brand-blue animate-spin duration-[4000ms]" />
+                              <div>
+                                <p className="text-xs font-black uppercase text-brand-charcoal tracking-wide">Transition Sand Timer</p>
+                                <p className="text-md font-mono font-bold text-brand-charcoal">
+                                  {Math.floor(countdownTime / 60)}:{(countdownTime % 60).toString().padStart(2, "0")} remaining
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button 
+                                onClick={() => setTimerRunning(!timerRunning)} 
+                                className="px-3 py-1.5 bg-brand-pink border border-brand-charcoal/10 text-[10px] font-bold uppercase tracking-wider rounded-lg cursor-pointer"
+                              >
+                                {timerRunning ? "Pause" : "Start"}
+                              </button>
+                              <button 
+                                onClick={() => { setCountdownTime(120); setTimerRunning(false); }} 
+                                className="p-1.5 border border-brand-charcoal/20 hover:bg-brand-cream rounded-lg cursor-pointer"
+                              >
+                                <RotateCcw className="w-4 h-4 text-brand-charcoal" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <p className="text-sm text-brand-charcoal/70 font-medium italic">
+                            "Alright class, quick change of plans! Fold everything up immediately, hurry up, and rush out to the outdoor courtyard now! Go, let"s move fast!"
+                          </p>
+                          {/* Simulated stress meter indicators */}
+                          <div className="pt-4">
+                            <p className="text-[10px] font-black tracking-wider text-rose-500 uppercase mb-2">Transition Uncertainty spike</p>
+                            <div className="h-2 bg-rose-200 border border-rose-500/20 rounded-full overflow-hidden">
+                              <div style={{ width: `${Math.max(30, autismSenses)}%` }} className="h-full bg-rose-500 transition-all duration-300" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "dyslexia" && (
+                  <motion.div
+                    key="dyslexia-screen"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex-grow flex flex-col justify-center border-2 rounded-2xl p-8 relative overflow-hidden transition-all duration-300 ${
+                      dyslexiaScaffold 
+                        ? dyslexiaTheme === "mint" 
+                          ? "bg-brand-cream border-brand-green/30" 
+                          : dyslexiaTheme === "peach" 
+                            ? "bg-amber-50 border-amber-300/30" 
+                            : "bg-sky-50 border-sky-300/30"
+                        : "bg-white border-brand-charcoal/10"
+                    }`}
+                  >
+                    <div className="z-10 w-full">
+                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Visual Crowding Alleviation</h3>
+                      
+                      {/* Dyslexia scaffold styling */}
+                      <p 
+                        className={`text-brand-charcoal transition-all duration-500 font-medium ${
+                          dyslexiaScaffold 
+                            ? "leading-[2.1] tracking-[0.10em] text-md" 
+                            : "leading-[1.1] tracking-tighter text-sm space-y-0.5 line-clamp-6 opacity-75 select-none font-sans"
+                        }`}
+                      >
+                        {dyslexiaScaffold ? (
+                          <>
+                            <span className="block mb-4 p-2.5 bg-brand-pink/15 border-l-4 border-brand-pink font-semibold">
+                              Tinted high-legibility layout:
+                            </span>
+                            The standard printed page frequently contains highly crowded characters that cause visual overlapping. By increasing row margins, applying cozy tint filters (such as mint-green or soft peach), and utilizing double spacing, we enable readers to isolate row segments comfortably without ocular crowding.
+                          </>
+                        ) : (
+                          "Thestandardprintedpagefrequentlycontainshighlycrowdedcharactersthatcausevisualoverlapping.Byincreasingrowmargins,applyingcozytintfilters(suchasmint-greenorsoftpeach),andutilizingdoublespacing,weenablereaderstoisolaterowsegmentscomfortablywithoutocularcrowding."
+                        )}
+                      </p>
+
+                      {dyslexiaScaffold && (
+                        <div className="mt-6 flex flex-wrap gap-3">
+                          <button 
+                            onClick={() => handleDictate("The standard printed page frequently contains highly crowded characters that cause visual overlapping. By increasing row margins, applying cozy tint filters, and utilizing double spacing, we enable readers to isolate row segments comfortably.")}
+                            className={`px-4 py-2 border-2 border-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all ${
+                              isDictating ? "bg-brand-pink text-brand-charcoal" : "bg-white text-brand-charcoal hover:bg-brand-cream"
+                            }`}
+                          >
+                            <BookOpen className="w-4 h-4" />
+                            {isDictating ? "Stop Audio Screen-Read" : "Read-Aloud Scaffold (TTS)"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "sensory" && (
+                  <motion.div
+                    key="sensory-screen"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ background: getSensoryBackground() }}
+                    className="flex-grow flex flex-col justify-center border-2 border-brand-charcoal/10 rounded-2xl p-8 relative overflow-hidden transition-all duration-300"
+                  >
+                    {/* Harsh Specular Glare simulator */}
+                    {!sensoryScaffold && (
+                      <div 
+                        style={{ opacity: sensoryGlare / 110 }}
+                        className="absolute inset-0 bg-gradient-to-tr from-white/95 via-transparent to-transparent pointer-events-none mix-blend-overlay z-10"
+                      />
+                    )}
+
+                    <div className="z-10 w-full relative">
+                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Visual Fatigue Dampening</h3>
+                      
+                      {sensoryScaffold ? (
+                        <div className="space-y-4">
+                          <p className="text-brand-charcoal text-sm leading-relaxed font-semibold">
+                            Harsh lighting and whiteboard glare trigger intense neurological fatigue. By converting classroom lighting to indirect angles and implementing structured 50-second ocular breaks, energy remains stable.
+                          </p>
+
+                          <div className="bg-white border-2 border-brand-charcoal rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-black uppercase text-brand-charcoal tracking-wide">Ocular Rest Synchronizer</p>
+                              <p className="text-xs text-brand-charcoal/60 mt-1">Soft breathing cycle to relax tracking muscles.</p>
+                            </div>
+                            <button
+                              onClick={() => setRestCycleActive(true)}
+                              className="px-4 py-2 bg-brand-teal text-brand-charcoal border border-brand-charcoal/10 text-xs font-bold uppercase tracking-wider rounded-lg cursor-pointer hover:bg-brand-blue"
+                            >
+                              {restCycleActive ? "Breathing..." : "Trigger Rest Cycle"}
+                            </button>
+                          </div>
+
+                          {restCycleActive && (
+                            <div className="bg-brand-cream/40 p-4 border rounded-xl flex items-center gap-4 animate-pulse">
+                              <div 
+                                style={{ transform: `scale(${0.8 + Math.sin(eyeProgress * 0.1) * 0.4})` }}
+                                className="w-8 h-8 rounded-full bg-brand-teal border-2 border-brand-charcoal transition-transform" 
+                              />
+                              <div className="flex-grow">
+                                <div className="h-2 bg-brand-charcoal/10 rounded-full overflow-hidden">
+                                  <div style={{ width: `${eyeProgress}%` }} className="h-full bg-brand-teal" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <p className="text-sm text-brand-charcoal/50 leading-relaxed font-bold italic uppercase tracking-wider">
+                            🔴 HIGH SPECULAR INTERFERENCE IN PROGRESS
+                          </p>
+                          <p className="text-sm text-brand-charcoal/75 leading-relaxed font-medium">
+                            Whiteboard reflects direct fluorescents. Eye tracking strains to isolate symbols, burning valuable cognitive focus within minutes and leading to severe sensory depletion.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* VIEWPORT FOOTER DESCRIPTION */}
+              <div className="mt-4 text-xs font-mono text-brand-charcoal/55 text-center p-2 bg-brand-cream/25 border border-brand-charcoal/5 rounded-lg">
+                {activeTab === "adhd" && (adhdScaffold ? "Focus Scaffold: Material segmented into modular high-contrast sprints." : "Challenge: Dense instructions lead to immediate detail dismissal.")}
+                {activeTab === "autism" && (autismScaffold ? "Routines Scaffold: Pictorial countdown blocks establish complete transition predictability." : "Challenge: Ambiguous, rapid announcements spark high situational defense.")}
+                {activeTab === "dyslexia" && (dyslexiaScaffold ? "Formatting Scaffold: Tint overlays and read-aloud modules alleviate letter-stress." : "Challenge: Tight visual character crowding generates line track confusion.")}
+                {activeTab === "sensory" && (sensoryScaffold ? "Atmosphere Scaffold: Satin muffle modes and micro eye-resets limit physical depletion." : "Challenge: Harsh specular flare triggers headaches and reading-loop dropouts.")}
+              </div>
+            </div>
+
+            {/* COLUMN 2: CONTROL DESK (5/12 cols) */}
+            <div className="lg:col-span-5 flex flex-col justify-between py-2 border-t lg:border-t-0 lg:border-l border-brand-charcoal/10 lg:pl-12 h-full min-h-[420px]">
+              <div>
+                <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-2 block">Pedagogy Control Desk</span>
+                <h3 className="text-3xl font-display text-brand-charcoal mb-4">Toggle the Scaffold</h3>
+                <p className="text-sm text-brand-charcoal/70 leading-relaxed font-semibold mb-8">
+                  Adjust environmental obstacles on the sliders to raise the barrier, then trigger the Scaffold to see the classroom adapt!
+                </p>
+
+                {/* ACTIVE CONTROLS SUB-PANEL */}
+                <div className="space-y-8">
+                  {/* SLIDERS MODULE */}
+                  {activeTab === "adhd" && (
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-black uppercase text-brand-charcoal tracking-wide">Environmental Distractions</span>
+                          <span className="text-xs font-black text-brand-pink font-mono">{adhdDistraction}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={adhdDistraction}
+                          onChange={(e) => setAdhdDistraction(Number(e.target.value))}
+                          disabled={adhdScaffold}
+                          className="w-full h-2.5 bg-brand-cream rounded-lg appearance-none cursor-pointer accent-brand-pink border border-brand-charcoal/10"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-4 bg-brand-cream/40 rounded-2xl border border-brand-charcoal/10">
+                        <div>
+                          <span className="text-xs font-black uppercase text-brand-charcoal tracking-wide block">Auditory Calmer Loop</span>
+                          <span className="text-[11px] text-brand-charcoal/60">Generate comforting low alpha frequency</span>
+                        </div>
+                        <button
+                          onClick={() => setAudioFocusPlaying(!audioFocusPlaying)}
+                          disabled={!adhdScaffold}
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl border border-brand-charcoal/10 cursor-pointer transition-all ${
+                            audioFocusPlaying 
+                              ? "bg-brand-pink text-brand-charcoal ring-2 ring-brand-pink/50 scale-105" 
+                              : "bg-white hover:bg-brand-cream text-brand-charcoal disabled:opacity-40 disabled:cursor-not-allowed"
+                          }`}
+                        >
+                          {audioFocusPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === "autism" && (
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-black uppercase text-brand-charcoal tracking-wide font-sans">Noise & Unexpected Changes</span>
+                          <span className="text-xs font-black text-brand-blue font-mono">{autismSenses}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={autismSenses}
+                          onChange={(e) => setAutismSenses(Number(e.target.value))}
+                          disabled={autismScaffold}
+                          className="w-full h-2.5 bg-brand-cream rounded-lg appearance-none cursor-pointer accent-brand-blue border border-brand-charcoal/10"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === "dyslexia" && (
+                    <div className="space-y-6">
+                      <div>
+                        <span className="text-xs font-black uppercase text-brand-charcoal tracking-wide block mb-3">Workspace Tint Overlays</span>
+                        <div className="flex gap-2">
+                          {[
+                            { name: "mint", bg: "bg-brand-cream border-brand-green/35", label: "Mint Forest" },
+                            { name: "peach", bg: "bg-amber-50 border-amber-300", label: "Peach Warmth" },
+                            { name: "blue", bg: "bg-sky-50 border-sky-300", label: "Ocean Mist" }
+                          ].map(t => (
+                            <button
+                              key={t.name}
+                              disabled={!dyslexiaScaffold}
+                              onClick={() => setDyslexiaTheme(t.name as any)}
+                              className={`flex-grow py-3 px-1 border-2 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all ${t.bg} ${
+                                dyslexiaTheme === t.name && dyslexiaScaffold
+                                  ? "ring-2 ring-brand-charcoal border-brand-charcoal scale-105" 
+                                  : "opacity-60 disabled:opacity-40 cursor-pointer"
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === "sensory" && (
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-black uppercase text-brand-charcoal tracking-wide">Specular Ceiling Glare</span>
+                          <span className="text-xs font-black text-brand-teal font-mono">{sensoryGlare}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={sensoryGlare}
+                          onChange={(e) => setSensoryGlare(Number(e.target.value))}
+                          disabled={sensoryScaffold}
+                          className="w-full h-2.5 bg-brand-cream rounded-lg appearance-none cursor-pointer accent-brand-teal border border-brand-charcoal/10"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* PRIMARY SCAFFOLD ENGAGER ACTION SWITCH */}
+              <div className="pt-10 border-t border-brand-charcoal/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-brand-charcoal text-sm uppercase tracking-wide">
+                      {activeTab === "adhd" && "Apply Sprint Support"}
+                      {activeTab === "autism" && "Apply Predictable Schedule"}
+                      {activeTab === "dyslexia" && "Apply Double Margin Spacing"}
+                      {activeTab === "sensory" && "Muffle Specular Glare"}
+                    </h5>
+                    <p className="text-xs text-brand-charcoal/60">Enable real-time inclusive adaptations</p>
+                  </div>
+                  
+                  {/* Retro Sleek Switch */}
+                  <button
+                    onClick={() => {
+                      if (activeTab === "adhd") {
+                        setAdhdScaffold(!adhdScaffold);
+                        setAudioFocusPlaying(false);
+                      }
+                      if (activeTab === "autism") {
+                        setAutismScaffold(!autismScaffold);
+                        setTimerRunning(!autismScaffold); // auto run transition countdown on apply!
+                      }
+                      if (activeTab === "dyslexia") {
+                        setDyslexiaScaffold(!dyslexiaScaffold);
+                        if (isDictating && "speechSynthesis" in window) {
+                          window.speechSynthesis.cancel();
+                          setIsDictating(false);
+                        }
+                      }
+                      if (activeTab === "sensory") {
+                        setSensoryScaffold(!sensoryScaffold);
+                        setRestCycleActive(false);
+                      }
+                    }}
+                    className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none cursor-pointer ${
+                      (activeTab === "adhd" && adhdScaffold) ||
+                      (activeTab === "autism" && autismScaffold) ||
+                      (activeTab === "dyslexia" && dyslexiaScaffold) ||
+                      (activeTab === "sensory" && sensoryScaffold)
+                        ? "bg-brand-pink" 
+                        : "bg-brand-charcoal/20"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow ${
+                        ((activeTab === "adhd" && adhdScaffold) ||
+                        (activeTab === "autism" && autismScaffold) ||
+                        (activeTab === "dyslexia" && dyslexiaScaffold) ||
+                        (activeTab === "sensory" && sensoryScaffold))
+                          ? "translate-x-9" 
+                          : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
       </div>
-      
-      <div className="grid lg:grid-cols-3 gap-8">
-        {[
-          { 
-            title: "Tier 1 School Network", 
-            description: "Deep, multi-session engagement across 15+ premier schools in Delhi NCR, Chandigarh, and Jaipur.",
-            icon: <School className="w-8 h-8" />,
-            label: "15+ Schools"
-          },
-          { 
-            title: "Destigmatization Sessions", 
-            description: "Tailored workshops for students and teachers designed to dismantle academic biases against neurodivergence.",
-            icon: <MessageSquare className="w-8 h-8" />,
-            label: "Projected 100+ Hours"
-          },
-          { 
-            title: "Diagnostic Hub Pilots", 
-            description: "Scaling our diagnostic camp model to serve students in Tier 2/3 regions through subsidized screening.",
-            icon: <Calendar className="w-8 h-8" />,
-            label: "Ongoing Rollout"
-          }
-        ].map((item, idx) => {
-          const cardColors = [
-            "bg-brand-blue/15 border-2 border-brand-blue/30 text-brand-charcoal",
-            "bg-brand-pink/15 border-2 border-brand-pink/30 text-brand-charcoal",
-            "bg-brand-green/15 border-2 border-brand-green/30 text-brand-charcoal"
-          ];
-          const iconColors = [
-            "text-brand-blue group-hover:bg-brand-blue group-hover:text-brand-charcoal",
-            "text-brand-pink group-hover:bg-brand-pink group-hover:text-brand-charcoal",
-            "text-brand-green group-hover:bg-brand-green group-hover:text-brand-charcoal"
-          ];
-          const badgeColors = ["text-brand-blue", "text-brand-pink", "text-brand-green"];
-          
-          return (
-            <motion.div 
-              key={idx}
-              whileHover={{ y: -12 }}
-              className={`${cardColors[idx % 3]} p-12 rounded-[2rem] shadow-sm group transition-all duration-300`}
-            >
-              <div className={`w-16 h-16 bg-brand-cream rounded-[2rem] flex items-center justify-center mb-10 transition-all duration-500 ${iconColors[idx % 3]}`}>
-                {item.icon}
-              </div>
-              <p className={`${badgeColors[idx % 3]} text-[12px] font-bold uppercase tracking-[1.5px] mb-4`}>{item.label}</p>
-              <h3 className="text-2xl mb-6 font-display leading-tight tracking-tight text-brand-charcoal">{item.title}</h3>
-              <p className="text-brand-charcoal leading-relaxed text-sm font-medium">{item.description}</p>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
+
+// --- END OF CORE COMPONENTS ---
+
 
 const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
   <section className="py-32 bg-gradient-to-br from-brand-blue/30 via-brand-cream to-brand-green/25 text-brand-charcoal relative overflow-hidden border-t border-brand-pink/20">
@@ -1586,7 +2229,7 @@ const TeamPage = () => (
           </div>
           <span className="px-4 py-1.5 bg-brand-pink/25 text-brand-pink border border-brand-pink/40 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Youth Leadership</span>
           <h3 className="text-2xl font-display text-brand-charcoal mb-4">Global Facilitators</h3>
-          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Driving outreach in India, Spain, UAE, and Thailand with structured regional leadership.</p>
+          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Driving outreach in India, Spain, UAE, Thailand, and Singapore with structured regional leadership.</p>
           <div className="mt-8 text-xs font-black uppercase text-brand-pink tracking-[2px] opacity-75">Revealing Soon</div>
         </div>
 
@@ -2072,8 +2715,6 @@ export default function App() {
           <>
             <Hero onViewPartner={() => (window as any).navigate('partner')} />
             <About />
-            <Timeline />
-            <Pipeline />
             <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
           </>
         )}
@@ -2081,7 +2722,6 @@ export default function App() {
           <>
             <div className="pt-20"> {/* Spacer for navbar */}
               <About />
-              <Timeline />
             </div>
             <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
           </>
@@ -2090,7 +2730,6 @@ export default function App() {
           <>
             <div className="pt-20">
               <WhyMatters onViewPartner={() => (window as any).navigate('partner')} />
-              <Pipeline />
             </div>
           </>
         )}
