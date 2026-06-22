@@ -1272,7 +1272,7 @@ const Hero = ({ onViewPartner }: { onViewPartner: () => void }) => {
 };
 
 const About = () => (
-  <section id="about" className="py-32 bg-brand-mint/20 overflow-hidden">
+  <section id="about" className="py-32 bg-gradient-to-b from-brand-cream/80 via-brand-green/10 to-brand-cream/85 overflow-hidden border-t border-b border-brand-green/20">
     <div className="max-w-7xl mx-auto px-6">
       <div className="grid lg:grid-cols-2 gap-20 items-center">
         <motion.div
@@ -1289,7 +1289,7 @@ const About = () => (
               Launched in February 2026, The Scaffold Initiative is a youth-led organization born from a critical observation: the "diagnostic cliff" between receiving a diagnosis and receiving actual support.
             </p>
             <p className="text-lg text-brand-charcoal mb-12 leading-relaxed font-medium">
-              We focus on academic inclusion for neurodivergent students in underserved Tier 2 and Tier 3 regions, ensuring that mental well-being is never an afterthought in the classroom.
+              We focus on academic inclusion for neurodivergent students in underserved Tier 2 and Tier 3 regions, ensuring that mental well-being is never an afterthought in their education.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="p-8 bg-brand-blue/20 rounded-3xl shadow-sm ">
@@ -1532,7 +1532,7 @@ const InclusionSandbox = () => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <span className="text-[11px] font-black tracking-[0.25em] uppercase text-brand-pink mb-4 block">Inclusive Sandbox</span>
-          <h2 className="text-5xl md:text-6xl mb-6 tracking-tighter font-display text-brand-charcoal">Experience the Classroom Scaffold</h2>
+          <h2 className="text-5xl md:text-6xl mb-6 tracking-tighter font-display text-brand-charcoal">Experience the Support Scaffold</h2>
           <p className="max-w-3xl mx-auto text-brand-charcoal text-lg font-medium leading-relaxed">
             Move sliders to emulate typical neurodivergent sensory/focus environments. Then, engage the "Scaffold" switch to experience how simple pedagogical structures restore comfort and concentration!
           </p>
@@ -1558,11 +1558,17 @@ const InclusionSandbox = () => {
               className={`p-6 border-2 text-left rounded-[2rem] transition-all duration-300 group cursor-pointer ${
                 activeTab === tab.id 
                   ? "bg-brand-charcoal border-brand-charcoal text-brand-white shadow-lg shadow-brand-charcoal/10 scale-[1.02]" 
-                  : "bg-white border-brand-charcoal/10 hover:-translate-y-1 hover:border-brand-charcoal/30"
+                  : tab.id === "adhd"
+                    ? "bg-brand-pink/10 border-brand-pink/20 hover:-translate-y-1 hover:border-brand-pink/45"
+                    : tab.id === "autism"
+                      ? "bg-brand-blue/10 border-brand-blue/20 hover:-translate-y-1 hover:border-brand-blue/45"
+                      : tab.id === "dyslexia"
+                        ? "bg-brand-green/10 border-brand-green/20 hover:-translate-y-1 hover:border-brand-green/45"
+                        : "bg-brand-teal/15 border-brand-teal/20 hover:-translate-y-1 hover:border-brand-teal/45"
               }`}
             >
               <div className="flex justify-between items-start mb-4">
-                <span className={`w-3 h-3 rounded-full ${activeTab === tab.id ? "bg-brand-pink" : "bg-brand-charcoal/25"}`} />
+                <span className={`w-3 h-3 rounded-full ${activeTab === tab.id ? "bg-brand-pink" : tab.id === "adhd" ? "bg-brand-pink" : tab.id === "autism" ? "bg-brand-blue" : tab.id === "dyslexia" ? "bg-brand-green" : "bg-brand-teal"}`} />
                 <ArrowRight className={`w-4 h-4 transition-transform ${activeTab === tab.id ? "text-brand-pink translate-x-0.5" : "text-brand-charcoal/30 group-hover:translate-x-1"}`} />
               </div>
               <h4 className={`font-bold tracking-tight text-md mb-1 ${activeTab === tab.id ? "text-white" : "text-brand-charcoal"}`}>{tab.label}</h4>
@@ -1572,7 +1578,7 @@ const InclusionSandbox = () => {
         </div>
 
         {/* Simulation Window Bento Grid */}
-        <div className="bg-white border-2 border-brand-charcoal/10 rounded-[3rem] p-8 md:p-14 shadow-xl shadow-brand-charcoal/5 relative overflow-hidden">
+        <div className="bg-gradient-to-tr from-brand-blue/5 via-brand-white/80 to-brand-pink/5 border-2 border-brand-charcoal/10 rounded-[3rem] p-8 md:p-14 shadow-xl shadow-brand-charcoal/5 relative overflow-hidden">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             
             {/* COLUMN 1: INTERACTIVE VIEWPORT (7/12 cols) */}
@@ -1586,9 +1592,6 @@ const InclusionSandbox = () => {
                   <span className="text-[11px] font-black tracking-[0.15em] uppercase text-brand-charcoal/50">
                     Simulation Viewport
                   </span>
-                </div>
-                <div className="px-3 py-1 bg-brand-cream text-brand-charcoal border border-brand-charcoal/15 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                  {adhdScaffold || autismScaffold || dyslexiaScaffold || sensoryScaffold ? "🔴 Scaffold Engaged" : "⚠️ Emulated Un-Scaffolded State"}
                 </div>
               </div>
 
@@ -1632,15 +1635,15 @@ const InclusionSandbox = () => {
                             <strong>Executive Sprint Engaged:</strong> 15-Minute focus window. Micro-chunking enabled:
                           </p>
                           <div className="grid gap-3">
-                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                            <label className="flex items-center gap-3 bg-brand-pink/5 p-3 border-2 border-brand-pink/30 rounded-xl shadow-[2px_2px_0px_rgba(248,175,203,0.25)] hover:-translate-y-0.5 transition-transform cursor-pointer">
                               <input type="checkbox" defaultChecked className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
                               <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">1. Sketch visual circles representing 14 elements (3 mins)</span>
                             </label>
-                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                            <label className="flex items-center gap-3 bg-brand-pink/5 p-3 border-2 border-brand-pink/30 rounded-xl shadow-[2px_2px_0px_rgba(248,175,203,0.25)] hover:-translate-y-0.5 transition-transform cursor-pointer">
                               <input type="checkbox" className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
                               <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">2. Group elements into pairs of matching counts (7 mins)</span>
                             </label>
-                            <label className="flex items-center gap-3 bg-white p-3 border-2 border-brand-charcoal rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-transform cursor-pointer">
+                            <label className="flex items-center gap-3 bg-brand-pink/5 p-3 border-2 border-brand-pink/30 rounded-xl shadow-[2px_2px_0px_rgba(248,175,203,0.25)] hover:-translate-y-0.5 transition-transform cursor-pointer">
                               <input type="checkbox" className="rounded text-brand-green focus:ring-brand-pink w-5 h-5 bg-brand-cream border-2" />
                               <span className="text-xs font-black tracking-wider text-brand-charcoal uppercase">3. Solve multiplication remainder ratio (5 mins)</span>
                             </label>
@@ -1680,22 +1683,22 @@ const InclusionSandbox = () => {
                     )}
 
                     <div className="z-10 w-full relative">
-                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Classroom Space Transition</h3>
+                      <h3 className="text-3xl font-display mb-4 text-brand-charcoal">Structured Space Transition</h3>
                       
                       {autismScaffold ? (
                         <div className="space-y-4">
                           <div className="p-4 bg-brand-green/10 border border-brand-green/30 rounded-xl mb-4">
-                            <span className="text-xs font-black tracking-wider block text-brand-pink uppercase mb-2">Classroom Rule Tracker</span>
+                            <span className="text-xs font-black tracking-wider block text-brand-pink uppercase mb-2">Visual Rule Tracker</span>
                             <p className="text-sm font-bold text-brand-charcoal leading-relaxed leading-[1.6]">
-                              1. Pack your materials inside the <span className="bg-white border px-1.5 py-0.5 rounded font-mono text-xs">SAGE CONTAINER #3</span>.
+                              1. Pack your materials inside the <span className="bg-brand-cream border px-1.5 py-0.5 rounded font-mono text-xs">SAGE CONTAINER #3</span>.
                             </p>
                             <p className="text-sm font-bold text-brand-charcoal leading-relaxed leading-[1.6] mt-2">
-                              2. Stand near your designated <span className="bg-white border px-1.5 py-0.5 rounded font-mono text-xs font-bold text-brand-pink">CIRCULAR MAT #B</span>.
+                              2. Stand near your designated <span className="bg-brand-cream border px-1.5 py-0.5 rounded font-mono text-xs font-bold text-brand-pink">CIRCULAR MAT #B</span>.
                             </p>
                           </div>
                           
                           {/* Visual Sand Timer Countdown */}
-                          <div className="bg-white border-2 border-brand-charcoal p-4 rounded-xl flex items-center justify-between">
+                          <div className="bg-brand-blue/15 border-2 border-brand-blue/30 p-4 rounded-xl flex items-center justify-between shadow-[2px_2px_0px_rgba(140,208,232,0.3)]">
                             <div className="flex items-center gap-3">
                               <Clock className="w-5 h-5 text-brand-blue animate-spin duration-[4000ms]" />
                               <div>
@@ -1753,7 +1756,7 @@ const InclusionSandbox = () => {
                           : dyslexiaTheme === "peach" 
                             ? "bg-amber-50 border-amber-300/30" 
                             : "bg-sky-50 border-sky-300/30"
-                        : "bg-white border-brand-charcoal/10"
+                        : "bg-brand-cream/60 border-brand-charcoal/10"
                     }`}
                   >
                     <div className="z-10 w-full">
@@ -1784,7 +1787,7 @@ const InclusionSandbox = () => {
                           <button 
                             onClick={() => handleDictate("The standard printed page frequently contains highly crowded characters that cause visual overlapping. By increasing row margins, applying cozy tint filters, and utilizing double spacing, we enable readers to isolate row segments comfortably.")}
                             className={`px-4 py-2 border-2 border-brand-charcoal rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all ${
-                              isDictating ? "bg-brand-pink text-brand-charcoal" : "bg-white text-brand-charcoal hover:bg-brand-cream"
+                              isDictating ? "bg-brand-pink text-brand-charcoal" : "bg-brand-cream text-brand-charcoal hover:bg-brand-green/20 hover:border-brand-green/45"
                             }`}
                           >
                             <BookOpen className="w-4 h-4" />
@@ -1820,10 +1823,10 @@ const InclusionSandbox = () => {
                       {sensoryScaffold ? (
                         <div className="space-y-4">
                           <p className="text-brand-charcoal text-sm leading-relaxed font-semibold">
-                            Harsh lighting and whiteboard glare trigger intense neurological fatigue. By converting classroom lighting to indirect angles and implementing structured 50-second ocular breaks, energy remains stable.
+                            Harsh lighting and whiteboard glare trigger intense neurological fatigue. By converting the lighting to indirect angles and implementing structured 50-second ocular breaks, energy remains stable.
                           </p>
 
-                          <div className="bg-white border-2 border-brand-charcoal rounded-xl p-4 flex items-center justify-between">
+                          <div className="bg-brand-teal/15 border-2 border-brand-teal/35 rounded-xl p-4 flex items-center justify-between shadow-[2px_2px_0px_rgba(104,186,198,0.25)]">
                             <div>
                               <p className="text-xs font-black uppercase text-brand-charcoal tracking-wide">Ocular Rest Synchronizer</p>
                               <p className="text-xs text-brand-charcoal/60 mt-1">Soft breathing cycle to relax tracking muscles.</p>
@@ -1880,7 +1883,7 @@ const InclusionSandbox = () => {
                 <span className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-pink mb-2 block">Pedagogy Control Desk</span>
                 <h3 className="text-3xl font-display text-brand-charcoal mb-4">Toggle the Scaffold</h3>
                 <p className="text-sm text-brand-charcoal/70 leading-relaxed font-semibold mb-8">
-                  Adjust environmental obstacles on the sliders to raise the barrier, then trigger the Scaffold to see the classroom adapt!
+                  Adjust environmental obstacles on the sliders to raise the barrier, then trigger the Scaffold to see the environment adapt!
                 </p>
 
                 {/* ACTIVE CONTROLS SUB-PANEL */}
@@ -1915,7 +1918,7 @@ const InclusionSandbox = () => {
                           className={`w-12 h-12 flex items-center justify-center rounded-xl border border-brand-charcoal/10 cursor-pointer transition-all ${
                             audioFocusPlaying 
                               ? "bg-brand-pink text-brand-charcoal ring-2 ring-brand-pink/50 scale-105" 
-                              : "bg-white hover:bg-brand-cream text-brand-charcoal disabled:opacity-40 disabled:cursor-not-allowed"
+                              : "bg-brand-cream hover:bg-brand-pink/20 text-brand-charcoal disabled:opacity-40 disabled:cursor-not-allowed"
                           }`}
                         >
                           {audioFocusPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
@@ -2092,7 +2095,7 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
                </div>
                <div>
                  <h4 className="text-2xl mb-4 font-display tracking-tight">Structural Scaffolding</h4>
-                 <p className="text-sm text-brand-charcoal leading-relaxed font-medium">We focus on Tier 2 & 3 regions where stigma is highest, providing the tools that bridge the gap between classroom and care.</p>
+                 <p className="text-sm text-brand-charcoal leading-relaxed font-medium">We focus on Tier 2 & 3 regions where stigma is highest, providing the tools that bridge the gap between school and care.</p>
                </div>
             </div>
           </div>
@@ -2116,12 +2119,14 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
 );
 
 const Footer = () => (
-  <footer className="py-24 bg-brand-charcoal text-brand-cream border-t ">
+  <footer className="py-24 bg-brand-charcoal text-brand-cream border-t border-brand-green/20">
     <div className="max-w-7xl mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 mb-20">
         <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-brand-cream rounded-[1.5rem] flex items-center justify-center font-display font-black text-xl text-brand-cream">S</div>
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-1.5 bg-brand-cream/10 border border-brand-cream/20 rounded-2xl flex justify-center items-center">
+                <ScaffoldLogo size={44} className="w-11 h-11 drop-shadow-md" />
+              </div>
               <span className="font-display font-black text-2xl tracking-tight text-brand-cream uppercase">The Scaffold Initiative</span>
             </div>
             <p className="text-brand-cream max-w-sm mb-10 text-lg leading-relaxed font-medium">
@@ -2143,7 +2148,7 @@ const Footer = () => (
           </ul>
         </div>
       </div>
-      <div className="border-t  pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream">
+      <div className="border-t border-brand-green/20 pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream">
         <p>© 2026 THE SCAFFOLD INITIATIVE.</p>
         <div>
           <button 
@@ -2184,58 +2189,28 @@ const FinalCTA = ({ onViewPartner }: { onViewPartner: () => void }) => (
   </section>
 );
 
-
-
-
 const TeamPage = () => (
-  <section className="min-h-[80vh] bg-brand-cream py-32 px-6 flex flex-col justify-center">
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-16">
-        <div className="w-24 h-24 bg-brand-green/20 text-brand-green rounded-[2.2rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
-          <Users className="w-12 h-12" />
-        </div>
-        <h1 className="text-5xl md:text-7xl font-display text-brand-charcoal mb-6 tracking-tighter">Meet The Team</h1>
-        <p className="text-lg text-brand-charcoal/80 max-w-2xl mx-auto font-medium">
-          The core team details will be revealed shortly. Here is an overview of our organizational structure.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8 mb-20 max-w-5xl mx-auto">
-        <div className="bg-brand-blue/15 border-2 border-brand-blue/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-          <div className="w-16 h-16 bg-brand-blue text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-8 h-8" />
-          </div>
-          <span className="px-4 py-1.5 bg-brand-blue/20 text-brand-blue border border-brand-blue/30 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Advisory & Psychiatry</span>
-          <h3 className="text-2xl font-display text-brand-charcoal mb-4">Clinical Liaison</h3>
-          <p className="text-sm text-brand-charcoal/80 font-medium">Coordination of psychiatrists, support screening networks, and diagnostic partners.</p>
-          <div className="mt-8 text-xs font-black uppercase text-brand-blue tracking-[2px] opacity-65">Revealing Soon</div>
-        </div>
-
-        <div className="bg-brand-pink/15 border-2 border-brand-pink/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-          <div className="w-16 h-16 bg-brand-pink text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Users className="w-8 h-8" />
-          </div>
-          <span className="px-4 py-1.5 bg-brand-pink/20 text-brand-pink border border-brand-pink/35 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Youth Leadership</span>
-          <h3 className="text-2xl font-display text-brand-charcoal mb-4">Global Facilitators</h3>
-          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Driving outreach in India, Spain, UAE, Thailand, and Singapore with structured regional leadership.</p>
-          <div className="mt-8 text-xs font-black uppercase text-brand-pink tracking-[2px] opacity-75">Revealing Soon</div>
-        </div>
-
-        <div className="bg-brand-green/15 border-2 border-brand-green/30 rounded-[2.5rem] p-10 text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-          <div className="w-16 h-16 bg-brand-green text-brand-charcoal rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Heart className="w-8 h-8" />
-          </div>
-          <span className="px-4 py-1.5 bg-brand-green/20 text-brand-green border border-brand-green/35 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">Inclusion Outreach</span>
-          <h3 className="text-2xl font-display text-brand-charcoal mb-4">School Liaison Hub</h3>
-          <p className="text-sm text-brand-charcoal/80 font-medium font-sans">Empowering students through school-specific academic scaffolds and curriculum planning.</p>
-          <div className="mt-8 text-xs font-black uppercase text-brand-green tracking-[2px] opacity-65">Revealing Soon</div>
-        </div>
-      </div>
+  <section className="min-h-[80vh] bg-gradient-to-br from-brand-blue/10 via-brand-cream to-brand-pink/10 py-32 px-6 flex flex-col justify-center items-center">
+    <div className="max-w-md w-full bg-white/40 backdrop-blur-md border-2 border-brand-pink/20 rounded-[3rem] p-12 text-center shadow-xl shadow-brand-charcoal/5 relative overflow-hidden">
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-blue opacity-10 blur-3xl" />
+      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-brand-pink opacity-10 blur-3xl" />
       
-      <div className="text-center">
+      <div className="relative z-10">
+        <div className="w-20 h-20 bg-brand-pink/15 text-brand-pink rounded-[1.8rem] flex items-center justify-center mb-8 mx-auto shadow-sm">
+          <Users className="w-10 h-10" />
+        </div>
+        
+        <span className="px-4 py-1.5 bg-brand-green/15 text-brand-green border border-brand-green/30 rounded-full text-[10px] uppercase font-black tracking-widest inline-block mb-4">
+          Core Team
+        </span>
+        
+        <h1 className="text-4xl md:text-5xl font-display text-brand-charcoal mb-10 tracking-tighter uppercase font-black">
+          Coming Soon
+        </h1>
+        
         <button 
           onClick={() => (window as any).navigate('home')}
-          className="px-8 py-4 bg-brand-charcoal text-brand-cream rounded-full text-sm font-bold uppercase tracking-wider hover:bg-brand-pink hover:text-brand-charcoal transition-all shadow-sm cursor-pointer"
+          className="w-full py-4 bg-brand-charcoal text-brand-cream rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-pink hover:text-brand-charcoal transition-all shadow-sm cursor-pointer hover:scale-[1.02]"
         >
           Return Home
         </button>
@@ -2310,7 +2285,7 @@ const PartnerPage = ({ onExit }: { onExit: () => void }) => {
   );
 
   return (
-    <div className="min-h-screen bg-brand-mint/20 py-20 px-6">
+    <div className="min-h-screen bg-gradient-to-b from-brand-green/10 via-brand-cream/80 to-brand-green/15 py-20 px-6">
       <div className="max-w-4xl mx-auto">
         <button 
           onClick={onExit}
@@ -2703,6 +2678,7 @@ export default function App() {
           <>
             <Hero onViewPartner={() => (window as any).navigate('partner')} />
             <About />
+            <InclusionSandbox />
             <FinalCTA onViewPartner={() => (window as any).navigate('partner')} />
           </>
         )}
