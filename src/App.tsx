@@ -2118,7 +2118,7 @@ const WhyMatters = ({ onViewPartner }: { onViewPartner: () => void }) => (
 const Footer = () => (
   <footer className="py-24 bg-brand-charcoal text-brand-cream border-t ">
     <div className="max-w-7xl mx-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 mb-20">
         <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 bg-brand-cream rounded-[1.5rem] flex items-center justify-center font-display font-black text-xl text-brand-cream">S</div>
@@ -2142,22 +2142,10 @@ const Footer = () => (
              <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Emergency support</button></li>
           </ul>
         </div>
-        <div>
-          <h4 className="font-black mb-8 uppercase text-[10px] tracking-[0.3em] text-brand-cream">Organization</h4>
-          <ul className="space-y-5 text-sm font-bold text-brand-cream tracking-tight">
-             <li><button onClick={() => (window as any).navigate('impact')} className="hover:text-brand-cream transition-colors">Impact roadmap</button></li>
-             <li><button onClick={() => (window as any).navigate('team')} className="hover:text-brand-cream transition-colors">Leadership</button></li>
-             <li><button onClick={() => (window as any).navigate('partner')} className="hover:text-brand-cream transition-colors">Contact center</button></li>
-          </ul>
-        </div>
       </div>
       <div className="border-t  pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-brand-cream">
         <p>© 2026 THE SCAFFOLD INITIATIVE.</p>
-        <div className="flex gap-8 px-8 py-3  rounded-full items-center">
-          <p>Global Advocacy</p>
-          <div className="w-px h-3 bg-brand-blue/30" />
-          <p>Youth-Led Project</p>
-          <div className="w-px h-3 bg-brand-green/30" />
+        <div>
           <button 
             onClick={() => (window as any).navigate('admin')} 
             className="hover:text-brand-cream transition-colors cursor-pointer uppercase tracking-[0.2em] font-black"
